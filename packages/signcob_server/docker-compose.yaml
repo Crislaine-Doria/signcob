@@ -1,0 +1,44 @@
+services:
+  # Development services
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: signcob
+      POSTGRES_PASSWORD: "BjcJsoM-8NkOyHOo3rfALUxNvEpBoFwB"
+    volumes:
+      - signcob_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "Ye24e9JIlopR7QpPyYElSCCrF2NQ77ye"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  # Test services
+  postgres_test:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: signcob_test
+      POSTGRES_PASSWORD: "i8P15Zz1R857bk21EpMa9cfZsUTo7BWr"
+    volumes:
+      - signcob_test_data:/var/lib/postgresql/data
+
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "PRzK7mJzFbmd_Cbhn_X2CzxVuBgDnTBa"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+volumes:
+  signcob_data:
+  signcob_test_data:

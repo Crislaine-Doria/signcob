@@ -1,0 +1,5 @@
+# melos_managed_dependency_overrides: signcob_client,flutter_secure_storage
+dependency_overrides:
+  signcob_client:
+    path: ..\\signcob_client
+  flutter_secure_storage: ^10.0.0

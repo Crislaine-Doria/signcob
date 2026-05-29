@@ -1,0 +1,4 @@
+name: signcob
+
+packages:
+  - packages/**
