@@ -20,16 +20,7 @@ void run(List<String> args) async {
   pod.initializeAuthServices(
     tokenManagerBuilders: [
       // Use JWT for authentication keys towards the server.
-      JwtConfigFromPasswords(
-
-      ),
-      JwtConfig(
-
-          refreshTokenHashPepper: pod.getPassword('jwtRefreshTokenHashPepper')!,
-          algorithm: JwtAlgorithm.hmacSha512(
-            SecretKey(pod.getPassword('jwtHmacSha512PrivateKey')!),
-          )
-      ),
+      JwtConfigFromPasswords(),
     ],
     identityProviderBuilders: [
       // Configure the email identity provider for email/password authentication.

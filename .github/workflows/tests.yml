@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: '3.2.3'
-      SERVERPOD_PASSWORD_database: 'i8P15Zz1R857bk21EpMa9cfZsUTo7BWr'
-      SERVERPOD_PASSWORD_redis: 'PRzK7mJzFbmd_Cbhn_X2CzxVuBgDnTBa'
 
     steps:
       - uses: actions/checkout@v4
@@ -21,27 +19,33 @@ jobs:
         with:
           flutter-version: '3.32.8'
 
+      - name: Prepare disposable database password
+        run: |
+          password="$(openssl rand -hex 32)"
+          echo "::add-mask::$password"
+          printf 'SIGNCOB_POSTGRES_TEST_PASSWORD=%s\nSERVERPOD_PASSWORD_database=%s\n' "$password" "$password" >> "$GITHUB_ENV"
+
       - name: Start containers
-        working-directory: signcob_server
-        run: docker compose up --build -d
+        working-directory: packages/signcob_server
+        run: docker compose up -d postgres_test
 
       - name: Install dependencies
-        working-directory: signcob_server
+        working-directory: packages/signcob_server
         run: dart pub get
 
       - name: Install Serverpod CLI
-        working-directory: signcob_server
+        working-directory: packages/signcob_server
         run: dart pub global activate serverpod_cli $VERSION
 
       - name: Run Serverpod generator
-        working-directory: signcob_server
+        working-directory: packages/signcob_server
         run: serverpod generate
 
       - name: Run tests
-        working-directory: signcob_server
+        working-directory: packages/signcob_server
         run: dart test
 
       - name: Stop containers
         if: always()
-        working-directory: signcob_server
+        working-directory: packages/signcob_server
         run: docker compose down -v

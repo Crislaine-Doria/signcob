@@ -3,39 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
-import 'screens/greetings_screen.dart';
+import 'screens/contact_screen.dart';
+import 'screens/public_home_screen.dart';
+import 'screens/calculator_hub_screen.dart';
+import 'screens/admin_contacts_screen.dart';
+import 'screens/admin_dashboard_screen.dart';
+import 'screens/admin_users_screen.dart';
+import 'screens/admin_clients_screen.dart';
+import 'screens/admin_cases_screen.dart';
+import 'screens/sign_in_screen.dart';
+import 'screens/content_screen.dart';
+import 'screens/admin_negotiations_screen.dart';
+import 'screens/calculators/work_accident_screen.dart';
+import 'screens/privacy_screen.dart';
+import 'theme/signcob_theme.dart';
 
-/// Sets up a global client object that can be used to talk to the server from
-/// anywhere in our app. The client is generated from your server code
-/// and is set up to connect to a Serverpod running on a local server on
-/// the default port. You will need to modify this to connect to staging or
-/// production servers.
-/// In a larger app, you may want to use the dependency injection of your choice
-/// instead of using a global client object. This is just a simple example.
 late final Client client;
 
-late String serverUrl;
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // When you are running the app on a physical device, you need to set the
-  // server URL to the IP address of your computer. You can find the IP
-  // address by running `ipconfig` on Windows or `ifconfig` on Mac/Linux.
-  //
-  // You can set the variable when running or building your app like this:
-  // E.g. `flutter run --dart-define=SERVER_URL=https://api.example.com/`.
-  //
-  // Otherwise, the server URL is fetched from the assets/config.json file or
-  // defaults to http://$localhost:8080/ if not found.
   final serverUrl = await getServerUrl();
-
   client = Client(serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
-
-  client.auth.initialize();
-
+  await client.auth.initialize();
   runApp(const MyApp());
 }
 
@@ -45,35 +36,100 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Serverpod Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MyHomePage(title: 'Serverpod Example'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: const GreetingsScreen(),
-      // To test authentication in this example app, uncomment the line below
-      // and comment out the line above. This wraps the GreetingsScreen with a
-      // SignInScreen, which automatically shows a sign-in UI when the user is
-      // not authenticated and displays the GreetingsScreen once they sign in.
-      //
-      // body: SignInScreen(
-      //   child: GreetingsScreen(
-      //     onSignOut: () async {
-      //       await client.auth.signOutDevice();
-      //     },
-      //   ),
-      // ),
+      title: 'SignCob',
+      theme: SignCobTheme.dark,
+      debugShowCheckedModeBanner: false,
+      routes: {
+        '/': (context) => PublicHomeScreen(
+          onCalculators: () => Navigator.pushNamed(context, '/calculadoras'),
+          onContact: () => Navigator.pushNamed(context, '/contato'),
+          onAdmin: () => Navigator.pushNamed(context, '/administrativo'),
+          onBlog: () => Navigator.pushNamed(context, '/blog'),
+          onPartners: () => Navigator.pushNamed(context, '/parceiros'),
+        ),
+        '/calculadoras': (_) => const CalculatorHubScreen(),
+        '/acidente-trabalho': (_) => const WorkAccidentScreen(),
+        '/privacidade': (_) => const PrivacyScreen(),
+        '/blog': (_) => ContentScreen(
+          key: const ValueKey('public-blog'),
+          partners: false,
+          loadArticles: client.content.articles,
+          loadPartners: client.content.partners,
+        ),
+        '/parceiros': (_) => ContentScreen(
+          key: const ValueKey('public-partners'),
+          partners: true,
+          loadArticles: client.content.articles,
+          loadPartners: client.content.partners,
+        ),
+        '/contato': (context) => ContactScreen(
+          onOpenAdmin: () => Navigator.pushNamed(context, '/administrativo'),
+          onSubmit: (name, email, message) =>
+              client.contact.submit(name, email, message),
+        ),
+        '/administrativo': (_) => SignInScreen(
+          child: AdminDashboardScreen(
+            debts: AdminNegotiationsScreen(
+              key: const ValueKey('negotiations-debt'),
+              kind: 'debt',
+              loadNegotiations: client.negotiation.list,
+              createNegotiation: client.negotiation.create,
+              changeNegotiation: client.negotiation.transition,
+              loadHistory: client.negotiation.history,
+            ),
+            fees: AdminNegotiationsScreen(
+              key: const ValueKey('negotiations-fees'),
+              kind: 'fees',
+              loadNegotiations: client.negotiation.list,
+              createNegotiation: client.negotiation.create,
+              changeNegotiation: client.negotiation.transition,
+              loadHistory: client.negotiation.history,
+            ),
+            articles: ContentScreen(
+              key: const ValueKey('admin-blog'),
+              partners: false,
+              loadArticles: client.content.adminArticles,
+              loadPartners: client.content.adminPartners,
+              saveArticle: client.content.saveArticle,
+            ),
+            partners: ContentScreen(
+              key: const ValueKey('admin-partners'),
+              partners: true,
+              loadArticles: client.content.adminArticles,
+              loadPartners: client.content.adminPartners,
+              savePartner: client.content.savePartner,
+            ),
+            cases: AdminCasesScreen(
+              loadCases: (offset) => client.caseRecord.list(offset),
+              importCase: (clientId, tribunal, number) => client.caseRecord
+                  .importFromDataJud(clientId, tribunal, number),
+              syncCase: (id) => client.caseRecord.sync(id),
+            ),
+            clients: AdminClientsScreen(
+              bindOwner: (id, authId) async {
+                await client.legalClient.bindOwner(id, authId);
+              },
+              assignLawyer: (id, lawyerId) async {
+                await client.legalClient.assign(id, lawyerId);
+              },
+              loadClients: (offset) => client.legalClient.list(offset),
+              saveClient: (id, name, email, phone, document) => id == null
+                  ? client.legalClient.create(name, email, phone, document)
+                  : client.legalClient.update(id, name, email, phone, document),
+            ),
+            contacts: AdminContactsScreen(
+              loadContacts: (offset) => client.contactAdmin.list(offset),
+              onSignOut: () => client.auth.signOutDevice(),
+            ),
+            users: AdminUsersScreen(
+              loadUsers: (offset) => client.accessAdmin.list(offset),
+              savePermissions: (userId, permissions) =>
+                  client.accessAdmin.setPermissions(userId, permissions),
+            ),
+            onSignOut: () => client.auth.signOutDevice(),
+          ),
+        ),
+      },
     );
   }
 }

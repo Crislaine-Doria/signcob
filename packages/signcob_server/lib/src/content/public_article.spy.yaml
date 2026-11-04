@@ -1,0 +1,10 @@
+class: PublicArticle
+table: public_article
+fields:
+  title: String
+  summary: String
+  body: String
+  externalUrl: String?
+  published: bool
+  createdAt: DateTime
+  updatedAt: DateTime

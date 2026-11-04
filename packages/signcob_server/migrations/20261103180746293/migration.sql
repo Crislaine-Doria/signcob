@@ -1,0 +1,64 @@
+BEGIN;
+
+--
+-- ACTION CREATE TABLE
+--
+CREATE TABLE "negotiation" (
+    "id" bigserial PRIMARY KEY,
+    "legalClientId" bigint NOT NULL,
+    "kind" text NOT NULL,
+    "title" text NOT NULL,
+    "amountCents" bigint NOT NULL,
+    "status" text NOT NULL,
+    "createdAt" timestamp without time zone NOT NULL,
+    "updatedAt" timestamp without time zone NOT NULL
+);
+
+--
+-- ACTION CREATE TABLE
+--
+CREATE TABLE "negotiation_event" (
+    "id" bigserial PRIMARY KEY,
+    "negotiationId" bigint NOT NULL,
+    "fromStatus" text,
+    "toStatus" text NOT NULL,
+    "occurredAt" timestamp without time zone NOT NULL,
+    "actorAuthUserId" text NOT NULL,
+    "note" text
+);
+
+
+--
+-- MIGRATION VERSION FOR signcob
+--
+INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
+    VALUES ('signcob', '20261103180746293', now())
+    ON CONFLICT ("module")
+    DO UPDATE SET "version" = '20261103180746293', "timestamp" = now();
+
+--
+-- MIGRATION VERSION FOR serverpod
+--
+INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
+    VALUES ('serverpod', '20251208110333922-v3-0-0', now())
+    ON CONFLICT ("module")
+    DO UPDATE SET "version" = '20251208110333922-v3-0-0', "timestamp" = now();
+
+--
+-- MIGRATION VERSION FOR serverpod_auth_idp
+--
+INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
+    VALUES ('serverpod_auth_idp', '20260109031533194', now())
+    ON CONFLICT ("module")
+    DO UPDATE SET "version" = '20260109031533194', "timestamp" = now();
+
+--
+-- MIGRATION VERSION FOR serverpod_auth_core
+--
+INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
+    VALUES ('serverpod_auth_core', '20251208110412389-v3-0-0', now())
+    ON CONFLICT ("module")
+    DO UPDATE SET "version" = '20251208110412389-v3-0-0', "timestamp" = now();
+
+
+COMMIT;

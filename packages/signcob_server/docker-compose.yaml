@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: signcob
-      POSTGRES_PASSWORD: "BjcJsoM-8NkOyHOo3rfALUxNvEpBoFwB"
+      POSTGRES_PASSWORD: ${SIGNCOB_POSTGRES_PASSWORD:-}
     volumes:
       - signcob_data:/var/lib/postgresql/data
 
@@ -15,9 +15,13 @@ services:
     image: redis:6.2.6
     ports:
       - "8091:6379"
-    command: redis-server --requirepass "Ye24e9JIlopR7QpPyYElSCCrF2NQ77ye"
+    command:
+      - /bin/sh
+      - -ec
+      - exec docker-entrypoint.sh redis-server --requirepass "$${SIGNCOB_REDIS_PASSWORD:?Set SIGNCOB_REDIS_PASSWORD}"
     environment:
       - REDIS_REPLICATION_MODE=master
+      - SIGNCOB_REDIS_PASSWORD
 
   # Test services
   postgres_test:
@@ -27,7 +31,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: signcob_test
-      POSTGRES_PASSWORD: "i8P15Zz1R857bk21EpMa9cfZsUTo7BWr"
+      POSTGRES_PASSWORD: ${SIGNCOB_POSTGRES_TEST_PASSWORD:-}
     volumes:
       - signcob_test_data:/var/lib/postgresql/data
 
@@ -35,9 +39,13 @@ services:
     image: redis:6.2.6
     ports:
       - "9091:6379"
-    command: redis-server --requirepass "PRzK7mJzFbmd_Cbhn_X2CzxVuBgDnTBa"
+    command:
+      - /bin/sh
+      - -ec
+      - exec docker-entrypoint.sh redis-server --requirepass "$${SIGNCOB_REDIS_TEST_PASSWORD:?Set SIGNCOB_REDIS_TEST_PASSWORD}"
     environment:
       - REDIS_REPLICATION_MODE=master
+      - SIGNCOB_REDIS_TEST_PASSWORD
 
 volumes:
   signcob_data:

@@ -1,11 +1,11 @@
 {
-    "name": "signcob_flutter",
-    "short_name": "signcob_flutter",
+    "name": "SignCob Advocacia",
+    "short_name": "SignCob",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B1630",
+    "theme_color": "#0B1630",
+    "description": "Atendimento especializado, informação e ferramentas jurídicas.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

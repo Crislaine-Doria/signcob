@@ -1,0 +1,15 @@
+class: LegalCase
+table: legal_case
+fields:
+  legalClientId: int
+  number: String
+  tribunal: String
+  className: String?
+  courtName: String?
+  lastSyncedAt: DateTime?
+  syncError: String?
+  movementsJson: String
+indexes:
+  legal_case_tribunal_number_unique:
+    fields: tribunal, number
+    unique: true

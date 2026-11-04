@@ -1,0 +1,3 @@
+exception: DataJudException
+fields:
+  message: String

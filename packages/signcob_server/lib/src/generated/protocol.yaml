@@ -1,3 +1,6 @@
+accessAdmin:
+  - list:
+  - setPermissions:
 emailIdp:
   - login:
   - startRegistration:
@@ -8,6 +11,32 @@ emailIdp:
   - finishPasswordReset:
 jwtRefresh:
   - refreshAccessToken:
+caseRecord:
+  - list:
+  - importFromDataJud:
+  - sync:
+contactAdmin:
+  - list:
+contact:
+  - submit:
+content:
+  - articles:
+  - partners:
+  - adminArticles:
+  - adminPartners:
+  - saveArticle:
+  - savePartner:
 greeting:
   - hello:
   - ola:
+legalClient:
+  - list:
+  - create:
+  - update:
+  - bindOwner:
+  - assign:
+negotiation:
+  - list:
+  - create:
+  - transition:
+  - history:

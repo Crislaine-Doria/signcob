@@ -1,0 +1,9 @@
+class: PublicPartner
+table: public_partner
+fields:
+  name: String
+  description: String
+  website: String
+  active: bool
+  createdAt: DateTime
+  updatedAt: DateTime

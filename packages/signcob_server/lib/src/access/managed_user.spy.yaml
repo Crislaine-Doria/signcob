@@ -1,0 +1,5 @@
+class: ManagedUser
+fields:
+  userId: String
+  email: String?
+  permissions: List<String>

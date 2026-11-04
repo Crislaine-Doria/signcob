@@ -1,0 +1,12 @@
+# Framework independente, reinstalável pela revisão registrada em AGENTS.md.
+/tools/software-house/
+
+# Estado local de execução dos agentes.
+/.studio/
+/build/
+/tools/testing/browser/node_modules/
+
+# Caches e arquivos de IDE locais.
+.dart_tool/
+.idea/
+*.iml

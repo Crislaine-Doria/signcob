@@ -1,0 +1,10 @@
+class: Negotiation
+table: negotiation
+fields:
+  legalClientId: int
+  kind: String
+  title: String
+  amountCents: int
+  status: String
+  createdAt: DateTime
+  updatedAt: DateTime

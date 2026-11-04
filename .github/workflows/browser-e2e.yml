@@ -1,0 +1,59 @@
+name: SignCob browser E2E
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.3'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Prepare Flutter and server
+        run: |
+          flutter precache --web
+          (cd packages/signcob_flutter && flutter pub get --enforce-lockfile)
+          (cd packages/signcob_server && dart pub get)
+
+      - name: Prepare browser
+        working-directory: tools/testing/browser
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx --no-install playwright install --with-deps chromium
+
+      - name: Prepare disposable database image
+        run: docker pull pgvector/pgvector:pg16
+
+      - name: Run journey and prove cleanup after failure
+        run: |
+          dart_sdk="$(dirname "$(realpath "$(command -v flutter)")")/cache/dart-sdk/bin/dart"
+          success=0
+          "$dart_sdk" tools/testing/run_isolated_e2e.dart --browser || success=$?
+          probe=0
+          "$dart_sdk" tools/testing/run_isolated_e2e.dart --browser --inject-failure || probe=$?
+          node tools/testing/browser/verify-results.mjs "$success" "$probe"
+
+      - name: Upload sanitized summaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signcob-browser-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/e2e/latest-browser-result.json
+            build/e2e/latest-browser-failure-probe.json
+          if-no-files-found: warn
+          retention-days: 7

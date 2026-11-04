@@ -1,4 +1,17 @@
 name: signcob
 
 packages:
-  - packages/**
+  - packages/signcob_client
+  - packages/signcob_server
+  - packages/signcob_flutter
+
+scripts:
+  analyze:
+    run: melos exec -- dart analyze
+    description: Analisa os três pacotes do SignCob.
+  test:flutter:
+    run: melos exec --scope=signcob_flutter -- flutter test
+    description: Executa os testes do aplicativo Flutter.
+  test:server:
+    run: melos exec --scope=signcob_server -- dart test
+    description: Executa os testes do servidor (requer serviços de teste Docker).

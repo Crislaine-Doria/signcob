@@ -1,0 +1,7 @@
+class: ContactMessage
+table: contact_message
+fields:
+  name: String
+  email: String
+  message: String
+  createdAt: DateTime

@@ -13,6 +13,12 @@ doc/api/
 
 # Passwords file
 config/passwords.yaml
+config/admin-initial-access.txt
 
 # Firebase service account key for Firebase auth
 config/firebase_service_account_key.json
+
+# Local integration credentials
+.env
+.env.*
+!.env.example

@@ -10,21 +10,59 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'dart:async' as _i2;
+import 'package:signcob_client/src/protocol/access/managed_user.dart' as _i3;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i1;
-import 'package:serverpod_client/serverpod_client.dart' as _i2;
-import 'dart:async' as _i3;
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:signcob_client/src/protocol/greetings/greeting.dart' as _i5;
-import 'protocol.dart' as _i6;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _i5;
+import 'package:signcob_client/src/protocol/cases/legal_case.dart' as _i6;
+import 'package:signcob_client/src/protocol/contact/contact_message.dart'
+    as _i7;
+import 'package:signcob_client/src/protocol/content/public_article.dart' as _i8;
+import 'package:signcob_client/src/protocol/content/public_partner.dart' as _i9;
+import 'package:signcob_client/src/protocol/greetings/greeting.dart' as _i10;
+import 'package:signcob_client/src/protocol/legal/legal_client.dart' as _i11;
+import 'package:signcob_client/src/protocol/negotiations/negotiation.dart'
+    as _i12;
+import 'package:signcob_client/src/protocol/negotiations/negotiation_event.dart'
+    as _i13;
+import 'protocol.dart' as _i14;
+
+/// {@category Endpoint}
+class EndpointAccessAdmin extends _i1.EndpointRef {
+  EndpointAccessAdmin(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'accessAdmin';
+
+  _i2.Future<List<_i3.ManagedUser>> list(int offset) =>
+      caller.callServerEndpoint<List<_i3.ManagedUser>>(
+        'accessAdmin',
+        'list',
+        {'offset': offset},
+      );
+
+  _i2.Future<void> setPermissions(
+    String userId,
+    List<String> permissions,
+  ) => caller.callServerEndpoint<void>(
+    'accessAdmin',
+    'setPermissions',
+    {
+      'userId': userId,
+      'permissions': permissions,
+    },
+  );
+}
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
 /// on the client.
 /// {@category Endpoint}
-class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
-  EndpointEmailIdp(_i2.EndpointCaller caller) : super(caller);
+class EndpointEmailIdp extends _i4.EndpointEmailIdpBase {
+  EndpointEmailIdp(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'emailIdp';
@@ -39,10 +77,10 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///
   /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
-  _i3.Future<_i4.AuthSuccess> login({
+  _i2.Future<_i5.AuthSuccess> login({
     required String email,
     required String password,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+  }) => caller.callServerEndpoint<_i5.AuthSuccess>(
     'emailIdp',
     'login',
     {
@@ -62,8 +100,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// registration. If the email is already registered, the returned ID will not
   /// be valid.
   @override
-  _i3.Future<_i2.UuidValue> startRegistration({required String email}) =>
-      caller.callServerEndpoint<_i2.UuidValue>(
+  _i2.Future<_i1.UuidValue> startRegistration({required String email}) =>
+      caller.callServerEndpoint<_i1.UuidValue>(
         'emailIdp',
         'startRegistration',
         {'email': email},
@@ -80,8 +118,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// - [EmailAccountRequestExceptionReason.invalid] if no request exists
   ///   for the given [accountRequestId] or [verificationCode] is invalid.
   @override
-  _i3.Future<String> verifyRegistrationCode({
-    required _i2.UuidValue accountRequestId,
+  _i2.Future<String> verifyRegistrationCode({
+    required _i1.UuidValue accountRequestId,
     required String verificationCode,
   }) => caller.callServerEndpoint<String>(
     'emailIdp',
@@ -107,10 +145,10 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///
   /// Returns a session for the newly created user.
   @override
-  _i3.Future<_i4.AuthSuccess> finishRegistration({
+  _i2.Future<_i5.AuthSuccess> finishRegistration({
     required String registrationToken,
     required String password,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+  }) => caller.callServerEndpoint<_i5.AuthSuccess>(
     'emailIdp',
     'finishRegistration',
     {
@@ -133,8 +171,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///   made too many attempts trying to request a password reset.
   ///
   @override
-  _i3.Future<_i2.UuidValue> startPasswordReset({required String email}) =>
-      caller.callServerEndpoint<_i2.UuidValue>(
+  _i2.Future<_i1.UuidValue> startPasswordReset({required String email}) =>
+      caller.callServerEndpoint<_i1.UuidValue>(
         'emailIdp',
         'startPasswordReset',
         {'email': email},
@@ -155,8 +193,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// should be overridden to return credentials for the next step instead
   /// of the credentials for setting the password.
   @override
-  _i3.Future<String> verifyPasswordResetCode({
-    required _i2.UuidValue passwordResetRequestId,
+  _i2.Future<String> verifyPasswordResetCode({
+    required _i1.UuidValue passwordResetRequestId,
     required String verificationCode,
   }) => caller.callServerEndpoint<String>(
     'emailIdp',
@@ -182,7 +220,7 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///
   /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
-  _i3.Future<void> finishPasswordReset({
+  _i2.Future<void> finishPasswordReset({
     required String finishPasswordResetToken,
     required String newPassword,
   }) => caller.callServerEndpoint<void>(
@@ -198,8 +236,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
 /// By extending [RefreshJwtTokensEndpoint], the JWT token refresh endpoint
 /// is made available on the server and enables automatic token refresh on the client.
 /// {@category Endpoint}
-class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
-  EndpointJwtRefresh(_i2.EndpointCaller caller) : super(caller);
+class EndpointJwtRefresh extends _i5.EndpointRefreshJwtTokens {
+  EndpointJwtRefresh(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'jwtRefresh';
@@ -223,9 +261,9 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   /// This endpoint is unauthenticated, meaning the client won't include any
   /// authentication information with the call.
   @override
-  _i3.Future<_i4.AuthSuccess> refreshAccessToken({
+  _i2.Future<_i5.AuthSuccess> refreshAccessToken({
     required String refreshToken,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+  }) => caller.callServerEndpoint<_i5.AuthSuccess>(
     'jwtRefresh',
     'refreshAccessToken',
     {'refreshToken': refreshToken},
@@ -233,43 +271,322 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   );
 }
 
+/// {@category Endpoint}
+class EndpointCaseRecord extends _i1.EndpointRef {
+  EndpointCaseRecord(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'caseRecord';
+
+  _i2.Future<List<_i6.LegalCase>> list(int offset) =>
+      caller.callServerEndpoint<List<_i6.LegalCase>>(
+        'caseRecord',
+        'list',
+        {'offset': offset},
+      );
+
+  _i2.Future<_i6.LegalCase> importFromDataJud(
+    int clientId,
+    String tribunal,
+    String number,
+  ) => caller.callServerEndpoint<_i6.LegalCase>(
+    'caseRecord',
+    'importFromDataJud',
+    {
+      'clientId': clientId,
+      'tribunal': tribunal,
+      'number': number,
+    },
+  );
+
+  _i2.Future<_i6.LegalCase> sync(int id) =>
+      caller.callServerEndpoint<_i6.LegalCase>(
+        'caseRecord',
+        'sync',
+        {'id': id},
+      );
+}
+
+/// Contact inbox available only to explicitly authorized operators.
+/// {@category Endpoint}
+class EndpointContactAdmin extends _i1.EndpointRef {
+  EndpointContactAdmin(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'contactAdmin';
+
+  _i2.Future<List<_i7.ContactMessage>> list(int offset) =>
+      caller.callServerEndpoint<List<_i7.ContactMessage>>(
+        'contactAdmin',
+        'list',
+        {'offset': offset},
+      );
+}
+
+/// Receives contact requests without exposing stored messages publicly.
+/// {@category Endpoint}
+class EndpointContact extends _i1.EndpointRef {
+  EndpointContact(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'contact';
+
+  _i2.Future<void> submit(
+    String name,
+    String email,
+    String message,
+  ) => caller.callServerEndpoint<void>(
+    'contact',
+    'submit',
+    {
+      'name': name,
+      'email': email,
+      'message': message,
+    },
+  );
+}
+
+/// {@category Endpoint}
+class EndpointContent extends _i1.EndpointRef {
+  EndpointContent(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'content';
+
+  _i2.Future<List<_i8.PublicArticle>> articles(int offset) =>
+      caller.callServerEndpoint<List<_i8.PublicArticle>>(
+        'content',
+        'articles',
+        {'offset': offset},
+      );
+
+  _i2.Future<List<_i9.PublicPartner>> partners(int offset) =>
+      caller.callServerEndpoint<List<_i9.PublicPartner>>(
+        'content',
+        'partners',
+        {'offset': offset},
+      );
+
+  _i2.Future<List<_i8.PublicArticle>> adminArticles(int offset) =>
+      caller.callServerEndpoint<List<_i8.PublicArticle>>(
+        'content',
+        'adminArticles',
+        {'offset': offset},
+      );
+
+  _i2.Future<List<_i9.PublicPartner>> adminPartners(int offset) =>
+      caller.callServerEndpoint<List<_i9.PublicPartner>>(
+        'content',
+        'adminPartners',
+        {'offset': offset},
+      );
+
+  _i2.Future<_i8.PublicArticle> saveArticle(
+    int? id,
+    String title,
+    String summary,
+    String body,
+    String? externalUrl,
+    bool published,
+  ) => caller.callServerEndpoint<_i8.PublicArticle>(
+    'content',
+    'saveArticle',
+    {
+      'id': id,
+      'title': title,
+      'summary': summary,
+      'body': body,
+      'externalUrl': externalUrl,
+      'published': published,
+    },
+  );
+
+  _i2.Future<_i9.PublicPartner> savePartner(
+    int? id,
+    String name,
+    String description,
+    String website,
+    bool active,
+  ) => caller.callServerEndpoint<_i9.PublicPartner>(
+    'content',
+    'savePartner',
+    {
+      'id': id,
+      'name': name,
+      'description': description,
+      'website': website,
+      'active': active,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
-class EndpointGreeting extends _i2.EndpointRef {
-  EndpointGreeting(_i2.EndpointCaller caller) : super(caller);
+class EndpointGreeting extends _i1.EndpointRef {
+  EndpointGreeting(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i5.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i5.Greeting>(
+  _i2.Future<_i10.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i10.Greeting>(
         'greeting',
         'hello',
         {'name': name},
       );
 
-  _i3.Future<_i5.Greeting> ola(String name) =>
-      caller.callServerEndpoint<_i5.Greeting>(
+  _i2.Future<_i10.Greeting> ola(String name) =>
+      caller.callServerEndpoint<_i10.Greeting>(
         'greeting',
         'ola',
         {'name': name},
       );
 }
 
-class Modules {
-  Modules(Client client) {
-    serverpod_auth_idp = _i1.Caller(client);
-    serverpod_auth_core = _i4.Caller(client);
-  }
+/// {@category Endpoint}
+class EndpointLegalClient extends _i1.EndpointRef {
+  EndpointLegalClient(_i1.EndpointCaller caller) : super(caller);
 
-  late final _i1.Caller serverpod_auth_idp;
+  @override
+  String get name => 'legalClient';
 
-  late final _i4.Caller serverpod_auth_core;
+  _i2.Future<List<_i11.LegalClient>> list(int offset) =>
+      caller.callServerEndpoint<List<_i11.LegalClient>>(
+        'legalClient',
+        'list',
+        {'offset': offset},
+      );
+
+  _i2.Future<_i11.LegalClient> create(
+    String name,
+    String? email,
+    String? phone,
+    String? document,
+  ) => caller.callServerEndpoint<_i11.LegalClient>(
+    'legalClient',
+    'create',
+    {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'document': document,
+    },
+  );
+
+  _i2.Future<_i11.LegalClient> update(
+    int id,
+    String name,
+    String? email,
+    String? phone,
+    String? document,
+  ) => caller.callServerEndpoint<_i11.LegalClient>(
+    'legalClient',
+    'update',
+    {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'document': document,
+    },
+  );
+
+  _i2.Future<_i11.LegalClient> bindOwner(
+    int id,
+    String? authUserId,
+  ) => caller.callServerEndpoint<_i11.LegalClient>(
+    'legalClient',
+    'bindOwner',
+    {
+      'id': id,
+      'authUserId': authUserId,
+    },
+  );
+
+  _i2.Future<_i11.LegalClient> assign(
+    int id,
+    String? lawyerId,
+  ) => caller.callServerEndpoint<_i11.LegalClient>(
+    'legalClient',
+    'assign',
+    {
+      'id': id,
+      'lawyerId': lawyerId,
+    },
+  );
 }
 
-class Client extends _i2.ServerpodClientShared {
+/// {@category Endpoint}
+class EndpointNegotiation extends _i1.EndpointRef {
+  EndpointNegotiation(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'negotiation';
+
+  _i2.Future<List<_i12.Negotiation>> list(
+    int offset,
+    String kind,
+  ) => caller.callServerEndpoint<List<_i12.Negotiation>>(
+    'negotiation',
+    'list',
+    {
+      'offset': offset,
+      'kind': kind,
+    },
+  );
+
+  _i2.Future<_i12.Negotiation> create(
+    int clientId,
+    String kind,
+    String title,
+    int amountCents,
+  ) => caller.callServerEndpoint<_i12.Negotiation>(
+    'negotiation',
+    'create',
+    {
+      'clientId': clientId,
+      'kind': kind,
+      'title': title,
+      'amountCents': amountCents,
+    },
+  );
+
+  _i2.Future<_i12.Negotiation> transition(
+    int id,
+    String toStatus,
+    String? note,
+  ) => caller.callServerEndpoint<_i12.Negotiation>(
+    'negotiation',
+    'transition',
+    {
+      'id': id,
+      'toStatus': toStatus,
+      'note': note,
+    },
+  );
+
+  _i2.Future<List<_i13.NegotiationEvent>> history(int id) =>
+      caller.callServerEndpoint<List<_i13.NegotiationEvent>>(
+        'negotiation',
+        'history',
+        {'id': id},
+      );
+}
+
+class Modules {
+  Modules(Client client) {
+    serverpod_auth_idp = _i4.Caller(client);
+    serverpod_auth_core = _i5.Caller(client);
+  }
+
+  late final _i4.Caller serverpod_auth_idp;
+
+  late final _i5.Caller serverpod_auth_core;
+}
+
+class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
@@ -280,16 +597,16 @@ class Client extends _i2.ServerpodClientShared {
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
-      _i2.MethodCallContext,
+      _i1.MethodCallContext,
       Object,
       StackTrace,
     )?
     onFailedCall,
-    Function(_i2.MethodCallContext)? onSucceededCall,
+    Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i6.Protocol(),
+         _i14.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -298,29 +615,57 @@ class Client extends _i2.ServerpodClientShared {
          disconnectStreamsOnLostInternetConnection:
              disconnectStreamsOnLostInternetConnection,
        ) {
+    accessAdmin = EndpointAccessAdmin(this);
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    caseRecord = EndpointCaseRecord(this);
+    contactAdmin = EndpointContactAdmin(this);
+    contact = EndpointContact(this);
+    content = EndpointContent(this);
     greeting = EndpointGreeting(this);
+    legalClient = EndpointLegalClient(this);
+    negotiation = EndpointNegotiation(this);
     modules = Modules(this);
   }
+
+  late final EndpointAccessAdmin accessAdmin;
 
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
 
+  late final EndpointCaseRecord caseRecord;
+
+  late final EndpointContactAdmin contactAdmin;
+
+  late final EndpointContact contact;
+
+  late final EndpointContent content;
+
   late final EndpointGreeting greeting;
+
+  late final EndpointLegalClient legalClient;
+
+  late final EndpointNegotiation negotiation;
 
   late final Modules modules;
 
   @override
-  Map<String, _i2.EndpointRef> get endpointRefLookup => {
+  Map<String, _i1.EndpointRef> get endpointRefLookup => {
+    'accessAdmin': accessAdmin,
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'caseRecord': caseRecord,
+    'contactAdmin': contactAdmin,
+    'contact': contact,
+    'content': content,
     'greeting': greeting,
+    'legalClient': legalClient,
+    'negotiation': negotiation,
   };
 
   @override
-  Map<String, _i2.ModuleEndpointCaller> get moduleLookup => {
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {
     'serverpod_auth_idp': modules.serverpod_auth_idp,
     'serverpod_auth_core': modules.serverpod_auth_core,
   };

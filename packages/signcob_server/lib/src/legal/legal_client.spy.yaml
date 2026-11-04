@@ -1,0 +1,11 @@
+class: LegalClient
+table: legal_client
+fields:
+  name: String
+  email: String?
+  phone: String?
+  document: String?
+  assignedLawyerId: String?
+  ownerAuthUserId: String?
+  createdAt: DateTime
+  updatedAt: DateTime

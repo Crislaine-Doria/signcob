@@ -1,0 +1,7 @@
+{
+  "name": "signcob-browser-e2e",
+  "private": true,
+  "dependencies": {
+    "playwright": "1.64.1"
+  }
+}

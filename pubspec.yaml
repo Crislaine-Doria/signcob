@@ -1,6 +1,8 @@
 name: signcob
+publish_to: none
+
 environment:
-  sdk: '>=2.18.0 <3.0.0'
-dependencies:
+  sdk: '^3.8.0'
+
+dev_dependencies:
   melos: 3.4.0
-  share_plus: ^7.0.0

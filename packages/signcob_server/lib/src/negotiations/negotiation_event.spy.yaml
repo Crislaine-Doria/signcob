@@ -1,0 +1,9 @@
+class: NegotiationEvent
+table: negotiation_event
+fields:
+  negotiationId: int
+  fromStatus: String?
+  toStatus: String
+  occurredAt: DateTime
+  actorAuthUserId: String
+  note: String?
