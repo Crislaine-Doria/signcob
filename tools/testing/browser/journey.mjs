@@ -135,8 +135,12 @@ try {
   step = 'edit-name';
   const name = field('Nome');
   await name.click();
-  await name.press('ControlOrMeta+a');
+  await name.fill('');
   await name.pressSequentially(updatedName);
+  if (await name.inputValue() !== updatedName) {
+    throw new Error('Unexpected text in the edit field');
+  }
+  await name.press('Tab');
   step = 'save-edit';
   const [updated] = await Promise.all([
     clientResponse('update'),
@@ -148,6 +152,7 @@ try {
   if (updated.request().postDataJSON().name !== updatedName) {
     throw new Error('Unexpected update value');
   }
+  step = 'edit-id';
   const { id: clientId } = await updated.json();
   if (!Number.isInteger(clientId)) throw new Error('Missing client ID');
   step = 'show-update';

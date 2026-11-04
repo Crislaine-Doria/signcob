@@ -259,6 +259,7 @@ Future<void> main(List<String> args) async {
             'failed-save-edit',
             'failed-edit-rejected',
             'failed-edit-value',
+            'failed-edit-id',
             'failed-show-update',
             'failed-reread',
             'failed-assign-lawyer-a',
