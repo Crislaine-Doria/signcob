@@ -60,11 +60,30 @@ try {
       await page.locator('flt-semantics-placeholder').dispatchEvent('click');
     };
     const signIn = async (user) => {
+      const previousStep = step;
+      step = 'login-open';
       await button('Área administrativa').click();
-      await field('E-mail').fill(user.email);
-      await field('Senha').fill(user.password);
-      await button('Entrar').click();
+      // Focus Flutter's active input before typing, as in the client edit.
+      step = 'login-email';
+      await field('E-mail').click();
+      await page.keyboard.insertText(user.email);
+      step = 'login-password';
+      await field('Senha').click();
+      await page.keyboard.insertText(user.password);
+      step = 'login-request';
+      const [response] = await Promise.all([
+        page.waitForResponse((result) => {
+          const request = result.request();
+          return result.url() === new URL('emailIdp', api).href &&
+            request.method() === 'POST' && request.postDataJSON()?.method === 'login';
+        }),
+        button('Entrar').click(),
+      ]);
+      step = 'login-rejected';
+      if (!response.ok()) throw new Error('Login request failed');
+      step = 'login-dashboard';
       await text('Área interna').waitFor();
+      step = previousStep;
     };
     const clientResponse = (method) => page.waitForResponse((response) => {
       const request = response.request();
@@ -79,7 +98,6 @@ try {
   await open(app.href);
   await button('Área administrativa').waitFor();
   checkpoint('web-build-loaded');
-  step = 'login';
   await signIn(manager);
   checkpoint('signed-in');
 

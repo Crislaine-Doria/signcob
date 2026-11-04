@@ -246,7 +246,12 @@ Future<void> main(List<String> args) async {
           } else if (const {
             'failed-launch',
             'failed-open-web-build',
-            'failed-login',
+            'failed-login-open',
+            'failed-login-email',
+            'failed-login-password',
+            'failed-login-request',
+            'failed-login-rejected',
+            'failed-login-dashboard',
             'failed-create',
             'failed-open-edit',
             'failed-edit-name',
