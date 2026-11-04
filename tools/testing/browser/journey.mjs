@@ -53,6 +53,20 @@ try {
     const text = (name) => page.getByText(name, { exact: true })
       .or(page.locator('flt-semantics').and(page.getByLabel(name, { exact: true })));
     const field = (name) => page.getByLabel(name, { exact: true });
+    const enterText = async (input, value) => {
+      await page.bringToFront();
+      await input.click();
+      // Flutter connects the semantic input to its text controller on a frame.
+      const settleInput = () => page.evaluate(() => new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }));
+      await settleInput();
+      await input.fill(value);
+      await settleInput();
+      if (await input.inputValue() !== value) {
+        throw new Error('Unexpected value in the active form field');
+      }
+    };
     const open = async (url) => {
       const [config, response] = await Promise.all([
         page.waitForResponse(new URL('assets/assets/config.json', app).href),
@@ -69,15 +83,10 @@ try {
       const previousStep = step;
       step = 'login-open';
       await button('Área administrativa').click();
-      // Focus Flutter's active input before typing, as in the client edit.
       step = 'login-email';
-      const email = field('E-mail');
-      await email.click();
-      await email.pressSequentially(user.email);
+      await enterText(field('E-mail'), user.email);
       step = 'login-password';
-      const password = field('Senha');
-      await password.click();
-      await password.pressSequentially(user.password);
+      await enterText(field('Senha'), user.password);
       step = 'login-request';
       const loginUrl = new URL('emailIdp', api).href;
       const isLogin = (request) => request.url() === loginUrl &&
@@ -108,10 +117,10 @@ try {
       return response.url() === clientsUrl &&
         request.method() === 'POST' && request.postDataJSON()?.method === method;
     });
-    return { page, button, text, field, open, signIn, clientResponse };
+    return { page, button, text, field, enterText, open, signIn, clientResponse };
   }
 
-  const { page, button, text, field, open, signIn, clientResponse } = await newSession();
+  const { page, button, text, field, enterText, open, signIn, clientResponse } = await newSession();
   step = 'open-web-build';
   await open(app.href);
   await button('Área administrativa').waitFor();
@@ -134,12 +143,7 @@ try {
   await button('Editar cliente').or(page.getByLabel('Editar cliente', { exact: true })).click();
   step = 'edit-name';
   const name = field('Nome');
-  await name.click();
-  await name.fill('');
-  await name.pressSequentially(updatedName);
-  if (await name.inputValue() !== updatedName) {
-    throw new Error('Unexpected text in the edit field');
-  }
+  await enterText(name, updatedName);
   await name.press('Tab');
   step = 'save-edit';
   const [updated] = await Promise.all([
@@ -170,8 +174,7 @@ try {
   async function assign(user) {
     await button('Atribuir advogado').or(field('Atribuir advogado')).click();
     const target = field('Identificador da conta do advogado');
-    await target.click();
-    await target.pressSequentially(user.userId);
+    await enterText(target, user.userId);
     const [response] = await Promise.all([
       clientResponse('assign'),
       button('Confirmar').click(),
