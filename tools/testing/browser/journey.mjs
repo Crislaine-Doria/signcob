@@ -29,8 +29,11 @@ try {
   }
   const app = localUrl(fixture.webUrl, '/app/');
   const api = localUrl(fixture.apiUrl, '/');
+  const executablePath = process.env.SIGNCOB_E2E_CHROME || undefined;
   browser = await chromium.launch({
-    executablePath: process.env.SIGNCOB_E2E_CHROME || undefined,
+    // Match the full browser used by a local Chrome override in headless mode.
+    channel: executablePath ? undefined : 'chromium',
+    executablePath,
     proxy: { server: 'http://127.0.0.1:1', bypass: '127.0.0.1' },
   });
   const checkpoint = (name) => process.stdout.write(name + '\n');
@@ -65,20 +68,32 @@ try {
       await button('Área administrativa').click();
       // Focus Flutter's active input before typing, as in the client edit.
       step = 'login-email';
-      await field('E-mail').click();
-      await page.keyboard.insertText(user.email);
+      const email = field('E-mail');
+      await email.click();
+      await email.pressSequentially(user.email);
       step = 'login-password';
-      await field('Senha').click();
-      await page.keyboard.insertText(user.password);
+      const password = field('Senha');
+      await password.click();
+      await password.pressSequentially(user.password);
       step = 'login-request';
-      const [response] = await Promise.all([
-        page.waitForResponse((result) => {
-          const request = result.request();
-          return result.url() === new URL('emailIdp', api).href &&
-            request.method() === 'POST' && request.postDataJSON()?.method === 'login';
-        }),
-        button('Entrar').click(),
-      ]);
+      const loginUrl = new URL('emailIdp', api).href;
+      const isLogin = (request) => request.url() === loginUrl &&
+        request.method() === 'POST' && request.postDataJSON()?.method === 'login';
+      let requested = false;
+      const observe = (request) => { if (isLogin(request)) requested = true; };
+      page.on('request', observe);
+      let response;
+      try {
+        [response] = await Promise.all([
+          page.waitForResponse((result) => isLogin(result.request())),
+          button('Entrar').click(),
+        ]);
+      } catch (error) {
+        step = requested ? 'login-no-response' : 'login-no-request';
+        throw error;
+      } finally {
+        page.off('request', observe);
+      }
       step = 'login-rejected';
       if (!response.ok()) throw new Error('Login request failed');
       step = 'login-dashboard';
