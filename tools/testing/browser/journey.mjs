@@ -29,11 +29,8 @@ try {
   }
   const app = localUrl(fixture.webUrl, '/app/');
   const api = localUrl(fixture.apiUrl, '/');
-  const executablePath = process.env.SIGNCOB_E2E_CHROME || undefined;
   browser = await chromium.launch({
-    // Match the full browser used by a local Chrome override in headless mode.
-    channel: executablePath ? undefined : 'chromium',
-    executablePath,
+    executablePath: process.env.SIGNCOB_E2E_CHROME || undefined,
     proxy: { server: 'http://127.0.0.1:1', bypass: '127.0.0.1' },
   });
   const checkpoint = (name) => process.stdout.write(name + '\n');
@@ -57,8 +54,14 @@ try {
       .or(page.locator('flt-semantics').and(page.getByLabel(name, { exact: true })));
     const field = (name) => page.getByLabel(name, { exact: true });
     const open = async (url) => {
-      const response = await page.goto(url);
+      const [config, response] = await Promise.all([
+        page.waitForResponse(new URL('assets/assets/config.json', app).href),
+        page.goto(url),
+      ]);
       if (!response?.ok()) throw new Error('Web build did not load');
+      if (!config.ok() || (await config.json()).apiUrl !== api.href) {
+        throw new Error('Unexpected isolated API configuration');
+      }
       // Flutter intentionally positions the accessibility switch offscreen.
       await page.locator('flt-semantics-placeholder').dispatchEvent('click');
     };

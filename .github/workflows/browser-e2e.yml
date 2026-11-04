@@ -33,7 +33,7 @@ jobs:
         working-directory: tools/testing/browser
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
-          npx --no-install playwright install --with-deps --no-shell chromium
+          npx --no-install playwright install --with-deps chromium
 
       - name: Prepare disposable database image
         run: docker pull pgvector/pgvector:pg16
