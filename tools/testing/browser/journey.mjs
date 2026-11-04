@@ -136,14 +136,17 @@ try {
   const name = field('Nome');
   await name.click();
   await name.press('ControlOrMeta+a');
-  await page.keyboard.insertText(updatedName);
+  await name.pressSequentially(updatedName);
   step = 'save-edit';
   const [updated] = await Promise.all([
     clientResponse('update'),
     button('Salvar cliente').click(),
   ]);
-  if (!updated.ok() || updated.request().postDataJSON().name !== updatedName) {
-    throw new Error('Unexpected update result');
+  step = 'edit-rejected';
+  if (!updated.ok()) throw new Error('Update request failed');
+  step = 'edit-value';
+  if (updated.request().postDataJSON().name !== updatedName) {
+    throw new Error('Unexpected update value');
   }
   const { id: clientId } = await updated.json();
   if (!Number.isInteger(clientId)) throw new Error('Missing client ID');
@@ -163,7 +166,7 @@ try {
     await button('Atribuir advogado').or(field('Atribuir advogado')).click();
     const target = field('Identificador da conta do advogado');
     await target.click();
-    await page.keyboard.insertText(user.userId);
+    await target.pressSequentially(user.userId);
     const [response] = await Promise.all([
       clientResponse('assign'),
       button('Confirmar').click(),
