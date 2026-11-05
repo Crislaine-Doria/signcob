@@ -18,31 +18,39 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
 import 'access/access_denied_exception.dart' as _i5;
 import 'access/managed_user.dart' as _i6;
-import 'cases/datajud_exception.dart' as _i7;
-import 'cases/legal_case.dart' as _i8;
-import 'contact/contact_message.dart' as _i9;
-import 'content/public_article.dart' as _i10;
-import 'content/public_partner.dart' as _i11;
-import 'greetings/greeting.dart' as _i12;
-import 'greetings/user.dart' as _i13;
-import 'legal/legal_client.dart' as _i14;
-import 'negotiations/negotiation.dart' as _i15;
-import 'negotiations/negotiation_event.dart' as _i16;
-import 'package:signcob_server/src/generated/access/managed_user.dart' as _i17;
-import 'package:signcob_server/src/generated/cases/legal_case.dart' as _i18;
+import 'billing/billing_charge.dart' as _i7;
+import 'billing/billing_charge_record.dart' as _i8;
+import 'billing/billing_exception.dart' as _i9;
+import 'billing/billing_status.dart' as _i10;
+import 'cases/datajud_exception.dart' as _i11;
+import 'cases/legal_case.dart' as _i12;
+import 'contact/contact_message.dart' as _i13;
+import 'content/public_article.dart' as _i14;
+import 'content/public_partner.dart' as _i15;
+import 'greetings/greeting.dart' as _i16;
+import 'greetings/user.dart' as _i17;
+import 'legal/legal_client.dart' as _i18;
+import 'negotiations/negotiation.dart' as _i19;
+import 'negotiations/negotiation_event.dart' as _i20;
+import 'package:signcob_server/src/generated/access/managed_user.dart' as _i21;
+import 'package:signcob_server/src/generated/cases/legal_case.dart' as _i22;
 import 'package:signcob_server/src/generated/contact/contact_message.dart'
-    as _i19;
-import 'package:signcob_server/src/generated/content/public_article.dart'
-    as _i20;
-import 'package:signcob_server/src/generated/content/public_partner.dart'
-    as _i21;
-import 'package:signcob_server/src/generated/legal/legal_client.dart' as _i22;
-import 'package:signcob_server/src/generated/negotiations/negotiation.dart'
     as _i23;
-import 'package:signcob_server/src/generated/negotiations/negotiation_event.dart'
+import 'package:signcob_server/src/generated/content/public_article.dart'
     as _i24;
+import 'package:signcob_server/src/generated/content/public_partner.dart'
+    as _i25;
+import 'package:signcob_server/src/generated/legal/legal_client.dart' as _i26;
+import 'package:signcob_server/src/generated/negotiations/negotiation.dart'
+    as _i27;
+import 'package:signcob_server/src/generated/negotiations/negotiation_event.dart'
+    as _i28;
 export 'access/access_denied_exception.dart';
 export 'access/managed_user.dart';
+export 'billing/billing_charge.dart';
+export 'billing/billing_charge_record.dart';
+export 'billing/billing_exception.dart';
+export 'billing/billing_status.dart';
 export 'cases/datajud_exception.dart';
 export 'cases/legal_case.dart';
 export 'contact/contact_message.dart';
@@ -62,6 +70,143 @@ class Protocol extends _i1.SerializationManagerServer {
   static final Protocol _instance = Protocol._();
 
   static final List<_i2.TableDefinition> targetTableDefinitions = [
+    _i2.TableDefinition(
+      name: 'billing_charge',
+      dartName: 'BillingChargeRecord',
+      schema: 'public',
+      module: 'signcob',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'billing_charge_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'legalClientId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'negotiationId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'idempotencyKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'providerId',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'amountCents',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'dueDate',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'status',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:BillingStatus',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'billing_charge_fk_0',
+          columns: ['legalClientId'],
+          referenceTable: 'legal_client',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'billing_charge_fk_1',
+          columns: ['negotiationId'],
+          referenceTable: 'negotiation',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'billing_charge_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'billing_charge_client_key_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'legalClientId',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'idempotencyKey',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'billing_charge_provider_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'providerId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _i2.TableDefinition(
       name: 'contact_message',
       dartName: 'ContactMessage',
@@ -723,35 +868,47 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i6.ManagedUser) {
       return _i6.ManagedUser.fromJson(data) as T;
     }
-    if (t == _i7.DataJudException) {
-      return _i7.DataJudException.fromJson(data) as T;
+    if (t == _i7.BillingCharge) {
+      return _i7.BillingCharge.fromJson(data) as T;
     }
-    if (t == _i8.LegalCase) {
-      return _i8.LegalCase.fromJson(data) as T;
+    if (t == _i8.BillingChargeRecord) {
+      return _i8.BillingChargeRecord.fromJson(data) as T;
     }
-    if (t == _i9.ContactMessage) {
-      return _i9.ContactMessage.fromJson(data) as T;
+    if (t == _i9.BillingException) {
+      return _i9.BillingException.fromJson(data) as T;
     }
-    if (t == _i10.PublicArticle) {
-      return _i10.PublicArticle.fromJson(data) as T;
+    if (t == _i10.BillingStatus) {
+      return _i10.BillingStatus.fromJson(data) as T;
     }
-    if (t == _i11.PublicPartner) {
-      return _i11.PublicPartner.fromJson(data) as T;
+    if (t == _i11.DataJudException) {
+      return _i11.DataJudException.fromJson(data) as T;
     }
-    if (t == _i12.Greeting) {
-      return _i12.Greeting.fromJson(data) as T;
+    if (t == _i12.LegalCase) {
+      return _i12.LegalCase.fromJson(data) as T;
     }
-    if (t == _i13.User) {
-      return _i13.User.fromJson(data) as T;
+    if (t == _i13.ContactMessage) {
+      return _i13.ContactMessage.fromJson(data) as T;
     }
-    if (t == _i14.LegalClient) {
-      return _i14.LegalClient.fromJson(data) as T;
+    if (t == _i14.PublicArticle) {
+      return _i14.PublicArticle.fromJson(data) as T;
     }
-    if (t == _i15.Negotiation) {
-      return _i15.Negotiation.fromJson(data) as T;
+    if (t == _i15.PublicPartner) {
+      return _i15.PublicPartner.fromJson(data) as T;
     }
-    if (t == _i16.NegotiationEvent) {
-      return _i16.NegotiationEvent.fromJson(data) as T;
+    if (t == _i16.Greeting) {
+      return _i16.Greeting.fromJson(data) as T;
+    }
+    if (t == _i17.User) {
+      return _i17.User.fromJson(data) as T;
+    }
+    if (t == _i18.LegalClient) {
+      return _i18.LegalClient.fromJson(data) as T;
+    }
+    if (t == _i19.Negotiation) {
+      return _i19.Negotiation.fromJson(data) as T;
+    }
+    if (t == _i20.NegotiationEvent) {
+      return _i20.NegotiationEvent.fromJson(data) as T;
     }
     if (t == _i1.getType<_i5.AccessDeniedException?>()) {
       return (data != null ? _i5.AccessDeniedException.fromJson(data) : null)
@@ -760,85 +917,98 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i6.ManagedUser?>()) {
       return (data != null ? _i6.ManagedUser.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.DataJudException?>()) {
-      return (data != null ? _i7.DataJudException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.BillingCharge?>()) {
+      return (data != null ? _i7.BillingCharge.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.LegalCase?>()) {
-      return (data != null ? _i8.LegalCase.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.BillingChargeRecord?>()) {
+      return (data != null ? _i8.BillingChargeRecord.fromJson(data) : null)
+          as T;
     }
-    if (t == _i1.getType<_i9.ContactMessage?>()) {
-      return (data != null ? _i9.ContactMessage.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i9.BillingException?>()) {
+      return (data != null ? _i9.BillingException.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.PublicArticle?>()) {
-      return (data != null ? _i10.PublicArticle.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i10.BillingStatus?>()) {
+      return (data != null ? _i10.BillingStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.PublicPartner?>()) {
-      return (data != null ? _i11.PublicPartner.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.DataJudException?>()) {
+      return (data != null ? _i11.DataJudException.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i12.Greeting?>()) {
-      return (data != null ? _i12.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i12.LegalCase?>()) {
+      return (data != null ? _i12.LegalCase.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i13.User?>()) {
-      return (data != null ? _i13.User.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i13.ContactMessage?>()) {
+      return (data != null ? _i13.ContactMessage.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i14.LegalClient?>()) {
-      return (data != null ? _i14.LegalClient.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i14.PublicArticle?>()) {
+      return (data != null ? _i14.PublicArticle.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i15.Negotiation?>()) {
-      return (data != null ? _i15.Negotiation.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i15.PublicPartner?>()) {
+      return (data != null ? _i15.PublicPartner.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i16.NegotiationEvent?>()) {
-      return (data != null ? _i16.NegotiationEvent.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i16.Greeting?>()) {
+      return (data != null ? _i16.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i17.User?>()) {
+      return (data != null ? _i17.User.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i18.LegalClient?>()) {
+      return (data != null ? _i18.LegalClient.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i19.Negotiation?>()) {
+      return (data != null ? _i19.Negotiation.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i20.NegotiationEvent?>()) {
+      return (data != null ? _i20.NegotiationEvent.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i17.ManagedUser>) {
+    if (t == List<_i21.ManagedUser>) {
       return (data as List)
-              .map((e) => deserialize<_i17.ManagedUser>(e))
+              .map((e) => deserialize<_i21.ManagedUser>(e))
               .toList()
           as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i18.LegalCase>) {
-      return (data as List).map((e) => deserialize<_i18.LegalCase>(e)).toList()
+    if (t == List<_i22.LegalCase>) {
+      return (data as List).map((e) => deserialize<_i22.LegalCase>(e)).toList()
           as T;
     }
-    if (t == List<_i19.ContactMessage>) {
+    if (t == List<_i23.ContactMessage>) {
       return (data as List)
-              .map((e) => deserialize<_i19.ContactMessage>(e))
+              .map((e) => deserialize<_i23.ContactMessage>(e))
               .toList()
           as T;
     }
-    if (t == List<_i20.PublicArticle>) {
+    if (t == List<_i24.PublicArticle>) {
       return (data as List)
-              .map((e) => deserialize<_i20.PublicArticle>(e))
+              .map((e) => deserialize<_i24.PublicArticle>(e))
               .toList()
           as T;
     }
-    if (t == List<_i21.PublicPartner>) {
+    if (t == List<_i25.PublicPartner>) {
       return (data as List)
-              .map((e) => deserialize<_i21.PublicPartner>(e))
+              .map((e) => deserialize<_i25.PublicPartner>(e))
               .toList()
           as T;
     }
-    if (t == List<_i22.LegalClient>) {
+    if (t == List<_i26.LegalClient>) {
       return (data as List)
-              .map((e) => deserialize<_i22.LegalClient>(e))
+              .map((e) => deserialize<_i26.LegalClient>(e))
               .toList()
           as T;
     }
-    if (t == List<_i23.Negotiation>) {
+    if (t == List<_i27.Negotiation>) {
       return (data as List)
-              .map((e) => deserialize<_i23.Negotiation>(e))
+              .map((e) => deserialize<_i27.Negotiation>(e))
               .toList()
           as T;
     }
-    if (t == List<_i24.NegotiationEvent>) {
+    if (t == List<_i28.NegotiationEvent>) {
       return (data as List)
-              .map((e) => deserialize<_i24.NegotiationEvent>(e))
+              .map((e) => deserialize<_i28.NegotiationEvent>(e))
               .toList()
           as T;
     }
@@ -858,16 +1028,20 @@ class Protocol extends _i1.SerializationManagerServer {
     return switch (type) {
       _i5.AccessDeniedException => 'AccessDeniedException',
       _i6.ManagedUser => 'ManagedUser',
-      _i7.DataJudException => 'DataJudException',
-      _i8.LegalCase => 'LegalCase',
-      _i9.ContactMessage => 'ContactMessage',
-      _i10.PublicArticle => 'PublicArticle',
-      _i11.PublicPartner => 'PublicPartner',
-      _i12.Greeting => 'Greeting',
-      _i13.User => 'User',
-      _i14.LegalClient => 'LegalClient',
-      _i15.Negotiation => 'Negotiation',
-      _i16.NegotiationEvent => 'NegotiationEvent',
+      _i7.BillingCharge => 'BillingCharge',
+      _i8.BillingChargeRecord => 'BillingChargeRecord',
+      _i9.BillingException => 'BillingException',
+      _i10.BillingStatus => 'BillingStatus',
+      _i11.DataJudException => 'DataJudException',
+      _i12.LegalCase => 'LegalCase',
+      _i13.ContactMessage => 'ContactMessage',
+      _i14.PublicArticle => 'PublicArticle',
+      _i15.PublicPartner => 'PublicPartner',
+      _i16.Greeting => 'Greeting',
+      _i17.User => 'User',
+      _i18.LegalClient => 'LegalClient',
+      _i19.Negotiation => 'Negotiation',
+      _i20.NegotiationEvent => 'NegotiationEvent',
       _ => null,
     };
   }
@@ -886,25 +1060,33 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'AccessDeniedException';
       case _i6.ManagedUser():
         return 'ManagedUser';
-      case _i7.DataJudException():
+      case _i7.BillingCharge():
+        return 'BillingCharge';
+      case _i8.BillingChargeRecord():
+        return 'BillingChargeRecord';
+      case _i9.BillingException():
+        return 'BillingException';
+      case _i10.BillingStatus():
+        return 'BillingStatus';
+      case _i11.DataJudException():
         return 'DataJudException';
-      case _i8.LegalCase():
+      case _i12.LegalCase():
         return 'LegalCase';
-      case _i9.ContactMessage():
+      case _i13.ContactMessage():
         return 'ContactMessage';
-      case _i10.PublicArticle():
+      case _i14.PublicArticle():
         return 'PublicArticle';
-      case _i11.PublicPartner():
+      case _i15.PublicPartner():
         return 'PublicPartner';
-      case _i12.Greeting():
+      case _i16.Greeting():
         return 'Greeting';
-      case _i13.User():
+      case _i17.User():
         return 'User';
-      case _i14.LegalClient():
+      case _i18.LegalClient():
         return 'LegalClient';
-      case _i15.Negotiation():
+      case _i19.Negotiation():
         return 'Negotiation';
-      case _i16.NegotiationEvent():
+      case _i20.NegotiationEvent():
         return 'NegotiationEvent';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -934,35 +1116,47 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'ManagedUser') {
       return deserialize<_i6.ManagedUser>(data['data']);
     }
+    if (dataClassName == 'BillingCharge') {
+      return deserialize<_i7.BillingCharge>(data['data']);
+    }
+    if (dataClassName == 'BillingChargeRecord') {
+      return deserialize<_i8.BillingChargeRecord>(data['data']);
+    }
+    if (dataClassName == 'BillingException') {
+      return deserialize<_i9.BillingException>(data['data']);
+    }
+    if (dataClassName == 'BillingStatus') {
+      return deserialize<_i10.BillingStatus>(data['data']);
+    }
     if (dataClassName == 'DataJudException') {
-      return deserialize<_i7.DataJudException>(data['data']);
+      return deserialize<_i11.DataJudException>(data['data']);
     }
     if (dataClassName == 'LegalCase') {
-      return deserialize<_i8.LegalCase>(data['data']);
+      return deserialize<_i12.LegalCase>(data['data']);
     }
     if (dataClassName == 'ContactMessage') {
-      return deserialize<_i9.ContactMessage>(data['data']);
+      return deserialize<_i13.ContactMessage>(data['data']);
     }
     if (dataClassName == 'PublicArticle') {
-      return deserialize<_i10.PublicArticle>(data['data']);
+      return deserialize<_i14.PublicArticle>(data['data']);
     }
     if (dataClassName == 'PublicPartner') {
-      return deserialize<_i11.PublicPartner>(data['data']);
+      return deserialize<_i15.PublicPartner>(data['data']);
     }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i12.Greeting>(data['data']);
+      return deserialize<_i16.Greeting>(data['data']);
     }
     if (dataClassName == 'User') {
-      return deserialize<_i13.User>(data['data']);
+      return deserialize<_i17.User>(data['data']);
     }
     if (dataClassName == 'LegalClient') {
-      return deserialize<_i14.LegalClient>(data['data']);
+      return deserialize<_i18.LegalClient>(data['data']);
     }
     if (dataClassName == 'Negotiation') {
-      return deserialize<_i15.Negotiation>(data['data']);
+      return deserialize<_i19.Negotiation>(data['data']);
     }
     if (dataClassName == 'NegotiationEvent') {
-      return deserialize<_i16.NegotiationEvent>(data['data']);
+      return deserialize<_i20.NegotiationEvent>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -1000,24 +1194,26 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i8.LegalCase:
-        return _i8.LegalCase.t;
-      case _i9.ContactMessage:
-        return _i9.ContactMessage.t;
-      case _i10.PublicArticle:
-        return _i10.PublicArticle.t;
-      case _i11.PublicPartner:
-        return _i11.PublicPartner.t;
-      case _i12.Greeting:
-        return _i12.Greeting.t;
-      case _i13.User:
-        return _i13.User.t;
-      case _i14.LegalClient:
-        return _i14.LegalClient.t;
-      case _i15.Negotiation:
-        return _i15.Negotiation.t;
-      case _i16.NegotiationEvent:
-        return _i16.NegotiationEvent.t;
+      case _i8.BillingChargeRecord:
+        return _i8.BillingChargeRecord.t;
+      case _i12.LegalCase:
+        return _i12.LegalCase.t;
+      case _i13.ContactMessage:
+        return _i13.ContactMessage.t;
+      case _i14.PublicArticle:
+        return _i14.PublicArticle.t;
+      case _i15.PublicPartner:
+        return _i15.PublicPartner.t;
+      case _i16.Greeting:
+        return _i16.Greeting.t;
+      case _i17.User:
+        return _i17.User.t;
+      case _i18.LegalClient:
+        return _i18.LegalClient.t;
+      case _i19.Negotiation:
+        return _i19.Negotiation.t;
+      case _i20.NegotiationEvent:
+        return _i20.NegotiationEvent.t;
     }
     return null;
   }

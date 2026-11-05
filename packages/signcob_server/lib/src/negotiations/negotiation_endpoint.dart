@@ -10,14 +10,16 @@ class NegotiationEndpoint extends Endpoint {
     s.authenticated!.userIdentifier,
   ).toString().toLowerCase();
   Future<void> _authorize(Session s, String scope) async {
-    if (!s.authenticated!.scopes.contains(Scope(scope)))
+    if (!s.authenticated!.scopes.contains(Scope(scope))) {
       throw AccessDeniedException(message: 'Acesso negado');
+    }
     await requireCurrentPermission(s, scope);
   }
 
   Future<bool> _manager(Session s) async {
-    if (!s.authenticated!.scopes.contains(const Scope('users.manage')))
+    if (!s.authenticated!.scopes.contains(const Scope('users.manage'))) {
       return false;
+    }
     final user = await AuthServices.instance.authUsers.get(
       s,
       authUserId: UuidValue.withValidation(_identity(s)),
@@ -32,10 +34,11 @@ class NegotiationEndpoint extends Endpoint {
       transaction: transaction,
     );
     if (client == null ||
-        (!await _manager(s) && client.assignedLawyerId != _identity(s)))
+        (!await _manager(s) && client.assignedLawyerId != _identity(s))) {
       throw AccessDeniedException(
         message: 'Negociação indisponível para esta conta',
       );
+    }
   }
 
   void _kind(String kind) {
@@ -88,8 +91,9 @@ class NegotiationEndpoint extends Endpoint {
     if (text.isEmpty ||
         text.length > 200 ||
         amountCents <= 0 ||
-        amountCents > 9000000000000)
+        amountCents > 9000000000000) {
       throw ArgumentError('Dados inválidos');
+    }
     return session.db.transaction((tx) async {
       await _client(session, clientId, transaction: tx);
       final now = DateTime.now().toUtc();
@@ -129,8 +133,9 @@ class NegotiationEndpoint extends Endpoint {
     await _authorize(session, 'negotiations.read');
     await _authorize(session, 'negotiations.write');
     final text = note?.trim();
-    if (text != null && text.length > 2000)
+    if (text != null && text.length > 2000) {
       throw ArgumentError('Nota muito longa');
+    }
     return session.db.transaction((tx) async {
       // Lock only this negotiation before validating its current transition.
       await session.db.unsafeQuery(
@@ -139,15 +144,17 @@ class NegotiationEndpoint extends Endpoint {
         transaction: tx,
       );
       final row = await Negotiation.db.findById(session, id, transaction: tx);
-      if (row == null)
+      if (row == null) {
         throw AccessDeniedException(message: 'Negociação indisponível');
+      }
       await _client(session, row.legalClientId, transaction: tx);
       final allowed = {
         'draft': {'proposed', 'cancelled'},
         'proposed': {'accepted', 'rejected', 'cancelled'},
       };
-      if (!(allowed[row.status]?.contains(toStatus) ?? false))
+      if (!(allowed[row.status]?.contains(toStatus) ?? false)) {
         throw ArgumentError('Transição inválida');
+      }
       final now = DateTime.now().toUtc();
       final updated = await Negotiation.db.updateRow(
         session,
@@ -173,8 +180,9 @@ class NegotiationEndpoint extends Endpoint {
   Future<List<NegotiationEvent>> history(Session session, int id) async {
     await _authorize(session, 'negotiations.read');
     final row = await Negotiation.db.findById(session, id);
-    if (row == null)
+    if (row == null) {
       throw AccessDeniedException(message: 'Negociação indisponível');
+    }
     await _client(session, row.legalClientId);
     return NegotiationEvent.db.find(
       session,

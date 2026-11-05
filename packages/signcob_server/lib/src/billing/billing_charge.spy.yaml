@@ -1,0 +1,10 @@
+class: BillingCharge
+fields:
+  id: int
+  legalClientId: int
+  negotiationId: int?
+  amountCents: int
+  dueDate: String
+  status: BillingStatus
+  createdAt: DateTime
+  updatedAt: DateTime

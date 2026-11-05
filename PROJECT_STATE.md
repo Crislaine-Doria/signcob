@@ -1,6 +1,6 @@
 # Estado do SignCob
 
-Atualizado em 04/11/2026.
+Atualizado em 05/11/2026.
 
 ## Decisões do responsável
 
@@ -635,3 +635,58 @@ ou priorizar com o responsável a jornada jurídica a migrar em seguida.
   e após reconferir a ponta remota. O acionamento manual requer o workflow
   na branch padrão. Linux/Chromium, SHA da execução remota, link e
   artefato ainda não verificados. Os workflows legados não foram executados.
+
+## Integração seletiva Asaas sobre a main remota — 05/11/2026
+
+- Origem local: `df3096cd61dd51fba4a17798f1747a7702ef12ba`, criado sobre
+  `c182451`. A ponta remota confirmada por fetch é
+  `64b5d2ce4f66090b1e96ae1b382139417a42a697`, com sete commits próprios.
+  O SHA informado na retomada tinha um sufixo divergente; este é o SHA real do Git.
+  A tentativa anterior de merge foi abortada e não foi reaproveitada.
+- Integração por subagente `integracao_asaas` na cópia independente
+  `build/asaas-integracao`, branch `codex/asaas-integracao`, baseada na ponta
+  remota. A sessão principal preparou a cópia, executou QA e registrou evidências.
+  Revisão técnica independente do commit candidato ainda pendente neste registro.
+- Reaplicados somente fontes/modelos/testes de billing e documentação operacional.
+  Incluídas as duas correções CI já revisadas: formatação de greeting_endpoint
+  e chaves nas condicionais de negotiation_endpoint, sem mudança de comportamento.
+  Workflows (inclusive senha efêmera dos testes), Compose, .gitignore, automação
+  de navegador e demais avanços remotos foram preservados.
+- Contratos do servidor/cliente e suporte de testes regenerados com Serverpod
+  CLI 3.2.3 no Dart 3.13.3 (`generate`). `create-migration` gerou a migration
+  `20261105145614533` sobre a cadeia remota: tabela billing_charge, duas FKs,
+  dois índices únicos e registros de versão. A migration local antiga
+  `20261104233003130` não integra esta nova cadeia. Nada gerado foi editado à mão.
+- O contrato billing.create/get/refresh exige login e capacidades atuais no token
+  e no banco. A chave é única por cliente, com reserva persistida antes do envio;
+  repetição divergente é recusada e resultado incerto não dispara novo envio.
+  O adaptador bloqueia criação Asaas, aceita somente configuração sandbox e
+  consulta apenas host HTTPS fixo. O aceite de negociação não cria cobrança.
+- Checks executados pela sessão principal no Windows com Dart 3.8.0:
+  `dart format --set-exit-if-changed .` no servidor: saída 0, 57 arquivos,
+  zero alterações; `dart analyze --fatal-infos` no servidor e no cliente gerado:
+  saída 0, sem diagnósticos; `dart test --reporter expanded --concurrency=1`:
+  saída 0, 34 testes aprovados (quatro de integração e três unitários Asaas novos).
+  Dependências QA resolvidas offline; o lockfile temporário do servidor foi
+  restaurado ao da base remota e não faz parte do incremento.
+- PostgreSQL 16/pgvector descartável com porta loopback efêmera e armazenamento
+  tmpfs; conexão por SERVERPOD_DATABASE_PASSWORD e variáveis oficiais, senha
+  efêmera somente no processo. A suíte aplicou a cadeia de migrations no banco
+  novo. O finally removeu o contêiner; consulta Docker pelo rótulo
+  signcob.qa=asaas-integracao confirmou zero contêineres restantes.
+  O Docker estava parado, foi iniciado em segundo plano e tornou-se disponível.
+  Nenhum banco preexistente foi iniciado ou alterado.
+- Preservação antes da revisão: hashes de 414 arquivos do workspace original e
+  oito arquivos locais adicionais/privados conferidos, zero diferenças. Inclui
+  arquivos de IDE, flutter_01.log, lockfile Flutter e configurações privadas.
+  O workspace original permanece em df3096c; a candidata fica na cópia isolada.
+  Caches, arquivos de IDE, logs, credenciais, clone do framework e documentos
+  locais alheios ao incremento não integram a seleção para commit.
+- Pendências de negócio preservadas: modalidades de cobrança, mapeamento seguro
+  de cliente no fornecedor e evento que confirma pagamento no sandbox. Estados
+  de confirmação/recebimento não são aceitos como pagamento. Conciliação de
+  reservas incertas ainda não tem fluxo próprio. Nenhuma chamada ao Asaas,
+  cobrança real, concessão de acesso, publicação ou worker externo foi habilitado.
+- Push sem force autorizado nesta retomada, condicionado à revisão independente,
+  conferência final de credenciais, preservação local e reconfirmação da ponta
+  remota. Não se autoriza publicação do aplicativo nem cobrança real.

@@ -11,6 +11,10 @@ emailIdp:
   - finishPasswordReset:
 jwtRefresh:
   - refreshAccessToken:
+billing:
+  - create:
+  - get:
+  - refresh:
 caseRecord:
   - list:
   - importFromDataJud:

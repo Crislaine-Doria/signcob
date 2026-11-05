@@ -17,18 +17,20 @@ import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i4;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i5;
-import 'package:signcob_client/src/protocol/cases/legal_case.dart' as _i6;
+import 'package:signcob_client/src/protocol/billing/billing_charge.dart' as _i6;
+import 'package:signcob_client/src/protocol/cases/legal_case.dart' as _i7;
 import 'package:signcob_client/src/protocol/contact/contact_message.dart'
-    as _i7;
-import 'package:signcob_client/src/protocol/content/public_article.dart' as _i8;
-import 'package:signcob_client/src/protocol/content/public_partner.dart' as _i9;
-import 'package:signcob_client/src/protocol/greetings/greeting.dart' as _i10;
-import 'package:signcob_client/src/protocol/legal/legal_client.dart' as _i11;
+    as _i8;
+import 'package:signcob_client/src/protocol/content/public_article.dart' as _i9;
+import 'package:signcob_client/src/protocol/content/public_partner.dart'
+    as _i10;
+import 'package:signcob_client/src/protocol/greetings/greeting.dart' as _i11;
+import 'package:signcob_client/src/protocol/legal/legal_client.dart' as _i12;
 import 'package:signcob_client/src/protocol/negotiations/negotiation.dart'
-    as _i12;
-import 'package:signcob_client/src/protocol/negotiations/negotiation_event.dart'
     as _i13;
-import 'protocol.dart' as _i14;
+import 'package:signcob_client/src/protocol/negotiations/negotiation_event.dart'
+    as _i14;
+import 'protocol.dart' as _i15;
 
 /// {@category Endpoint}
 class EndpointAccessAdmin extends _i1.EndpointRef {
@@ -272,24 +274,64 @@ class EndpointJwtRefresh extends _i5.EndpointRefreshJwtTokens {
 }
 
 /// {@category Endpoint}
+class EndpointBilling extends _i1.EndpointRef {
+  EndpointBilling(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'billing';
+
+  _i2.Future<_i6.BillingCharge> create(
+    int clientId,
+    int? negotiationId,
+    int amountCents,
+    String dueDate,
+    String idempotencyKey,
+  ) => caller.callServerEndpoint<_i6.BillingCharge>(
+    'billing',
+    'create',
+    {
+      'clientId': clientId,
+      'negotiationId': negotiationId,
+      'amountCents': amountCents,
+      'dueDate': dueDate,
+      'idempotencyKey': idempotencyKey,
+    },
+  );
+
+  _i2.Future<_i6.BillingCharge> get(int id) =>
+      caller.callServerEndpoint<_i6.BillingCharge>(
+        'billing',
+        'get',
+        {'id': id},
+      );
+
+  _i2.Future<_i6.BillingCharge> refresh(int id) =>
+      caller.callServerEndpoint<_i6.BillingCharge>(
+        'billing',
+        'refresh',
+        {'id': id},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointCaseRecord extends _i1.EndpointRef {
   EndpointCaseRecord(_i1.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'caseRecord';
 
-  _i2.Future<List<_i6.LegalCase>> list(int offset) =>
-      caller.callServerEndpoint<List<_i6.LegalCase>>(
+  _i2.Future<List<_i7.LegalCase>> list(int offset) =>
+      caller.callServerEndpoint<List<_i7.LegalCase>>(
         'caseRecord',
         'list',
         {'offset': offset},
       );
 
-  _i2.Future<_i6.LegalCase> importFromDataJud(
+  _i2.Future<_i7.LegalCase> importFromDataJud(
     int clientId,
     String tribunal,
     String number,
-  ) => caller.callServerEndpoint<_i6.LegalCase>(
+  ) => caller.callServerEndpoint<_i7.LegalCase>(
     'caseRecord',
     'importFromDataJud',
     {
@@ -299,8 +341,8 @@ class EndpointCaseRecord extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i6.LegalCase> sync(int id) =>
-      caller.callServerEndpoint<_i6.LegalCase>(
+  _i2.Future<_i7.LegalCase> sync(int id) =>
+      caller.callServerEndpoint<_i7.LegalCase>(
         'caseRecord',
         'sync',
         {'id': id},
@@ -315,8 +357,8 @@ class EndpointContactAdmin extends _i1.EndpointRef {
   @override
   String get name => 'contactAdmin';
 
-  _i2.Future<List<_i7.ContactMessage>> list(int offset) =>
-      caller.callServerEndpoint<List<_i7.ContactMessage>>(
+  _i2.Future<List<_i8.ContactMessage>> list(int offset) =>
+      caller.callServerEndpoint<List<_i8.ContactMessage>>(
         'contactAdmin',
         'list',
         {'offset': offset},
@@ -353,42 +395,42 @@ class EndpointContent extends _i1.EndpointRef {
   @override
   String get name => 'content';
 
-  _i2.Future<List<_i8.PublicArticle>> articles(int offset) =>
-      caller.callServerEndpoint<List<_i8.PublicArticle>>(
+  _i2.Future<List<_i9.PublicArticle>> articles(int offset) =>
+      caller.callServerEndpoint<List<_i9.PublicArticle>>(
         'content',
         'articles',
         {'offset': offset},
       );
 
-  _i2.Future<List<_i9.PublicPartner>> partners(int offset) =>
-      caller.callServerEndpoint<List<_i9.PublicPartner>>(
+  _i2.Future<List<_i10.PublicPartner>> partners(int offset) =>
+      caller.callServerEndpoint<List<_i10.PublicPartner>>(
         'content',
         'partners',
         {'offset': offset},
       );
 
-  _i2.Future<List<_i8.PublicArticle>> adminArticles(int offset) =>
-      caller.callServerEndpoint<List<_i8.PublicArticle>>(
+  _i2.Future<List<_i9.PublicArticle>> adminArticles(int offset) =>
+      caller.callServerEndpoint<List<_i9.PublicArticle>>(
         'content',
         'adminArticles',
         {'offset': offset},
       );
 
-  _i2.Future<List<_i9.PublicPartner>> adminPartners(int offset) =>
-      caller.callServerEndpoint<List<_i9.PublicPartner>>(
+  _i2.Future<List<_i10.PublicPartner>> adminPartners(int offset) =>
+      caller.callServerEndpoint<List<_i10.PublicPartner>>(
         'content',
         'adminPartners',
         {'offset': offset},
       );
 
-  _i2.Future<_i8.PublicArticle> saveArticle(
+  _i2.Future<_i9.PublicArticle> saveArticle(
     int? id,
     String title,
     String summary,
     String body,
     String? externalUrl,
     bool published,
-  ) => caller.callServerEndpoint<_i8.PublicArticle>(
+  ) => caller.callServerEndpoint<_i9.PublicArticle>(
     'content',
     'saveArticle',
     {
@@ -401,13 +443,13 @@ class EndpointContent extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i9.PublicPartner> savePartner(
+  _i2.Future<_i10.PublicPartner> savePartner(
     int? id,
     String name,
     String description,
     String website,
     bool active,
-  ) => caller.callServerEndpoint<_i9.PublicPartner>(
+  ) => caller.callServerEndpoint<_i10.PublicPartner>(
     'content',
     'savePartner',
     {
@@ -430,15 +472,15 @@ class EndpointGreeting extends _i1.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i2.Future<_i10.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i10.Greeting>(
+  _i2.Future<_i11.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i11.Greeting>(
         'greeting',
         'hello',
         {'name': name},
       );
 
-  _i2.Future<_i10.Greeting> ola(String name) =>
-      caller.callServerEndpoint<_i10.Greeting>(
+  _i2.Future<_i11.Greeting> ola(String name) =>
+      caller.callServerEndpoint<_i11.Greeting>(
         'greeting',
         'ola',
         {'name': name},
@@ -452,19 +494,19 @@ class EndpointLegalClient extends _i1.EndpointRef {
   @override
   String get name => 'legalClient';
 
-  _i2.Future<List<_i11.LegalClient>> list(int offset) =>
-      caller.callServerEndpoint<List<_i11.LegalClient>>(
+  _i2.Future<List<_i12.LegalClient>> list(int offset) =>
+      caller.callServerEndpoint<List<_i12.LegalClient>>(
         'legalClient',
         'list',
         {'offset': offset},
       );
 
-  _i2.Future<_i11.LegalClient> create(
+  _i2.Future<_i12.LegalClient> create(
     String name,
     String? email,
     String? phone,
     String? document,
-  ) => caller.callServerEndpoint<_i11.LegalClient>(
+  ) => caller.callServerEndpoint<_i12.LegalClient>(
     'legalClient',
     'create',
     {
@@ -475,13 +517,13 @@ class EndpointLegalClient extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i11.LegalClient> update(
+  _i2.Future<_i12.LegalClient> update(
     int id,
     String name,
     String? email,
     String? phone,
     String? document,
-  ) => caller.callServerEndpoint<_i11.LegalClient>(
+  ) => caller.callServerEndpoint<_i12.LegalClient>(
     'legalClient',
     'update',
     {
@@ -493,10 +535,10 @@ class EndpointLegalClient extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i11.LegalClient> bindOwner(
+  _i2.Future<_i12.LegalClient> bindOwner(
     int id,
     String? authUserId,
-  ) => caller.callServerEndpoint<_i11.LegalClient>(
+  ) => caller.callServerEndpoint<_i12.LegalClient>(
     'legalClient',
     'bindOwner',
     {
@@ -505,10 +547,10 @@ class EndpointLegalClient extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i11.LegalClient> assign(
+  _i2.Future<_i12.LegalClient> assign(
     int id,
     String? lawyerId,
-  ) => caller.callServerEndpoint<_i11.LegalClient>(
+  ) => caller.callServerEndpoint<_i12.LegalClient>(
     'legalClient',
     'assign',
     {
@@ -525,10 +567,10 @@ class EndpointNegotiation extends _i1.EndpointRef {
   @override
   String get name => 'negotiation';
 
-  _i2.Future<List<_i12.Negotiation>> list(
+  _i2.Future<List<_i13.Negotiation>> list(
     int offset,
     String kind,
-  ) => caller.callServerEndpoint<List<_i12.Negotiation>>(
+  ) => caller.callServerEndpoint<List<_i13.Negotiation>>(
     'negotiation',
     'list',
     {
@@ -537,12 +579,12 @@ class EndpointNegotiation extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i12.Negotiation> create(
+  _i2.Future<_i13.Negotiation> create(
     int clientId,
     String kind,
     String title,
     int amountCents,
-  ) => caller.callServerEndpoint<_i12.Negotiation>(
+  ) => caller.callServerEndpoint<_i13.Negotiation>(
     'negotiation',
     'create',
     {
@@ -553,11 +595,11 @@ class EndpointNegotiation extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<_i12.Negotiation> transition(
+  _i2.Future<_i13.Negotiation> transition(
     int id,
     String toStatus,
     String? note,
-  ) => caller.callServerEndpoint<_i12.Negotiation>(
+  ) => caller.callServerEndpoint<_i13.Negotiation>(
     'negotiation',
     'transition',
     {
@@ -567,8 +609,8 @@ class EndpointNegotiation extends _i1.EndpointRef {
     },
   );
 
-  _i2.Future<List<_i13.NegotiationEvent>> history(int id) =>
-      caller.callServerEndpoint<List<_i13.NegotiationEvent>>(
+  _i2.Future<List<_i14.NegotiationEvent>> history(int id) =>
+      caller.callServerEndpoint<List<_i14.NegotiationEvent>>(
         'negotiation',
         'history',
         {'id': id},
@@ -606,7 +648,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i14.Protocol(),
+         _i15.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -618,6 +660,7 @@ class Client extends _i1.ServerpodClientShared {
     accessAdmin = EndpointAccessAdmin(this);
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    billing = EndpointBilling(this);
     caseRecord = EndpointCaseRecord(this);
     contactAdmin = EndpointContactAdmin(this);
     contact = EndpointContact(this);
@@ -633,6 +676,8 @@ class Client extends _i1.ServerpodClientShared {
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointBilling billing;
 
   late final EndpointCaseRecord caseRecord;
 
@@ -655,6 +700,7 @@ class Client extends _i1.ServerpodClientShared {
     'accessAdmin': accessAdmin,
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'billing': billing,
     'caseRecord': caseRecord,
     'contactAdmin': contactAdmin,
     'contact': contact,

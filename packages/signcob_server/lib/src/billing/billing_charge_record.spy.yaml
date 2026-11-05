@@ -1,0 +1,20 @@
+class: BillingChargeRecord
+serverOnly: true
+table: billing_charge
+fields:
+  legalClientId: int, relation(parent=legal_client)
+  negotiationId: int?, relation(parent=negotiation)
+  idempotencyKey: String
+  providerId: String?
+  amountCents: int
+  dueDate: String
+  status: BillingStatus
+  createdAt: DateTime
+  updatedAt: DateTime
+indexes:
+  billing_charge_client_key_idx:
+    fields: legalClientId, idempotencyKey
+    unique: true
+  billing_charge_provider_idx:
+    fields: providerId
+    unique: true

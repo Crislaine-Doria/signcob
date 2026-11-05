@@ -1,0 +1,6 @@
+enum: BillingStatus
+serialized: byName
+values:
+  - awaitingProvider
+  - pending
+  - overdue

@@ -31,14 +31,18 @@ class GreetingEndpoint extends Endpoint {
       timestamp: DateTime.now(),
     );
   }
+
   Future<Greeting> ola(Session session, String name) async {
     session.log('diga que roudou pf');
-    Greeting greeting= await Greeting.db.insertRow(session,Greeting(
-      message: 'Ola! $name tudo bem? ',
-      author: 'Serverpod',
-      timestamp: DateTime.now(),
-    ));
+    Greeting greeting = await Greeting.db.insertRow(
+      session,
+      Greeting(
+        message: 'Ola! $name tudo bem? ',
+        author: 'Serverpod',
+        timestamp: DateTime.now(),
+      ),
+    );
 
-    return  greeting;
-}
+    return greeting;
+  }
 }
