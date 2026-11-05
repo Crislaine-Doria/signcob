@@ -720,3 +720,29 @@ ou priorizar com o responsável a jornada jurídica a migrar em seguida.
   anterior também tem cópia local. As configurações privadas e os três arquivos
   não rastreados devem manter seus hashes. As alterações intencionais ao
   workspace são a integração revisada e a preservação dos avanços remotos.
+
+### Envio e preservação confirmados — 05/11/2026
+
+- O commit documental `41c6f1adeacd718368ebd821032bf8a913f93ed8` também foi
+  aceito por `revisao_integracao_asaas`. Antes do envio, o fetch confirmou a
+  ponta remota `64b5d2c`, ancestralidade 0/2 e cópia candidata limpa. A varredura
+  do intervalo commitado confirmou 33 arquivos, zero credenciais/arquivos
+  indevidos e zero mudanças nos arquivos remotos protegidos.
+- Push `HEAD:main` sem force concluído: avanço remoto `64b5d2c..41c6f1a`,
+  confirmado por ls-remote. A main do workspace original foi alinhada a
+  `41c6f1a` com main...origin/main = 0/0; não há alterações rastreadas pendentes.
+  A branch `codex/asaas-original-df3096c` preserva o commit local anterior.
+- Os 58 arquivos apenas locais foram restaurados, sem sobrepor arquivos
+  rastreados da candidata e sem incluí-los no commit. A conferência final
+  encontrou 401 arquivos originais não afetados/restaurados com hashes
+  idênticos, além dos oito arquivos privados/adicionais intactos. Documentos e
+  scripts auxiliares permanecem não rastreados; IDE/caches permanecem ignorados.
+  A migration Asaas antiga está fora da cadeia ativa e preservada no backup.
+- A primeira conferência final de preservação sinalizou o arquivo retirado
+  definition_project.json como se fosse inalterado: o Git inferiu uma renomeação
+  entre migrations. Repetir a comparação com --no-renames classificou origem
+  e destino corretamente; a verificação passou sem restaurar a migration antiga.
+- Este registro de resultado altera somente a documentação. Workflows remotos
+  desta nova entrega ainda não foram inspecionados; testes locais e revisão
+  acima permanecem a evidência de aceite. Decisões Asaas seguem pendentes,
+  criação real permanece bloqueada e nenhuma publicação do aplicativo ocorreu.
