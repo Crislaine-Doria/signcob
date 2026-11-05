@@ -690,3 +690,33 @@ ou priorizar com o responsável a jornada jurídica a migrar em seguida.
 - Push sem force autorizado nesta retomada, condicionado à revisão independente,
   conferência final de credenciais, preservação local e reconfirmação da ponta
   remota. Não se autoriza publicação do aplicativo nem cobrança real.
+
+### Parecer e fechamento da candidata
+
+- Revisão técnica independente por `revisao_integracao_asaas`: `accepted`, sem
+  achados acionáveis, sobre o commit
+  `5b1fea05537a18540b3694fb01da915539fed9be` (parent `64b5d2c`). O revisor leu
+  fontes, contratos/dispatch, testes e evidência 34/34; não reexecutou suíte/CLI.
+  Confirmou que a migration altera zero tabelas preexistentes e adiciona somente
+  billing_charge. Varredura independente do diff commitado não encontrou nenhum
+  dos 24 valores privados locais, credenciais reais ou arquivos indevidos.
+- Revisão breve de processo pelo mesmo subagente (perfil 54): divergência de
+  histórico e schema gerado foram a fricção observada; manter base remota e
+  selecionar fontes antes de regenerar evitou repetir o merge conflituoso.
+  Sem acompanhamento adicional além das conferências finais de remoto/estado.
+- O commit posterior a essa revisão altera apenas este estado, registrando o
+  SHA revisado e o parecer. Publicação do aplicativo e testes de navegador não
+  fazem parte desta entrega. Os checks locais do incremento estão aprovados;
+  os workflows remotos desta nova revisão dependem de execução após o push.
+- Fechamento autorizado: reconfirmar origin/main, ancestralidade e diff final;
+  enviar HEAD:main sem force a partir da cópia isolada. O histórico remoto é
+  preservado. Caso a ponta tenha avançado, interromper o envio e reintegrar.
+- Procedimento local após envio confirmado: preservar df3096c na branch
+  `codex/asaas-original-df3096c`, alinhar a main à candidata e restaurar 58
+  arquivos apenas locais sem sobrepor caminhos da candidata nem comitá-los.
+  Incluem documentação, scripts auxiliares e arquivos de IDE/cache.
+  Cinco arquivos da migration Asaas substituída permanecem na branch original
+  e em build/asaas-arquivos-originais, fora da cadeia ativa. PROJECT_STATE.md
+  anterior também tem cópia local. As configurações privadas e os três arquivos
+  não rastreados devem manter seus hashes. As alterações intencionais ao
+  workspace são a integração revisada e a preservação dos avanços remotos.
