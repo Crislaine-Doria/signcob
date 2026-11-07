@@ -11,6 +11,19 @@ fields:
   status: BillingStatus
   createdAt: DateTime
   updatedAt: DateTime
+  environment: String?
+  accountId: String?
+  kind: String?
+  method: BillingMethod?
+  flow: BillingFlow?
+  installmentCount: int?
+  cycle: BillingCycle?
+  providerCustomerId: String?
+  externalReference: String?
+  providerGroupId: String?
+  creationState: String?
+  createAttempted: bool?
+  subscriptionStatus: String?
 indexes:
   billing_charge_client_key_idx:
     fields: legalClientId, idempotencyKey

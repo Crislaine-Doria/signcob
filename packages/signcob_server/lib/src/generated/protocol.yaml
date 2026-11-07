@@ -14,11 +14,26 @@ jwtRefresh:
 billing:
   - create:
   - get:
+  - list:
+  - findIntent:
   - refresh:
+  - resolveCustomer:
+  - reconcileCustomer:
+  - listClients:
+  - listNegotiations:
 caseRecord:
   - list:
   - importFromDataJud:
   - sync:
+chat:
+  - listCreationClients:
+  - createConversation:
+  - addParticipant:
+  - removeParticipant:
+  - listParticipants:
+  - listConversations:
+  - listMessages:
+  - sendMessage:
 contactAdmin:
   - list:
 contact:

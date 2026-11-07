@@ -16,16 +16,19 @@ import '../auth/email_idp_endpoint.dart' as _i3;
 import '../auth/jwt_refresh_endpoint.dart' as _i4;
 import '../billing/billing_endpoint.dart' as _i5;
 import '../cases/case_record_endpoint.dart' as _i6;
-import '../contact/contact_admin_endpoint.dart' as _i7;
-import '../contact/contact_endpoint.dart' as _i8;
-import '../content/content_endpoint.dart' as _i9;
-import '../greetings/greeting_endpoint.dart' as _i10;
-import '../legal/legal_client_endpoint.dart' as _i11;
-import '../negotiations/negotiation_endpoint.dart' as _i12;
-import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i13;
-import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+import '../chat/chat_endpoint.dart' as _i7;
+import '../contact/contact_admin_endpoint.dart' as _i8;
+import '../contact/contact_endpoint.dart' as _i9;
+import '../content/content_endpoint.dart' as _i10;
+import '../greetings/greeting_endpoint.dart' as _i11;
+import '../legal/legal_client_endpoint.dart' as _i12;
+import '../negotiations/negotiation_endpoint.dart' as _i13;
+import 'package:signcob_server/src/generated/billing/billing_create_request.dart'
     as _i14;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _i15;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i16;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -61,37 +64,43 @@ class Endpoints extends _i1.EndpointDispatch {
           'caseRecord',
           null,
         ),
-      'contactAdmin': _i7.ContactAdminEndpoint()
+      'chat': _i7.ChatEndpoint()
+        ..initialize(
+          server,
+          'chat',
+          null,
+        ),
+      'contactAdmin': _i8.ContactAdminEndpoint()
         ..initialize(
           server,
           'contactAdmin',
           null,
         ),
-      'contact': _i8.ContactEndpoint()
+      'contact': _i9.ContactEndpoint()
         ..initialize(
           server,
           'contact',
           null,
         ),
-      'content': _i9.ContentEndpoint()
+      'content': _i10.ContentEndpoint()
         ..initialize(
           server,
           'content',
           null,
         ),
-      'greeting': _i10.GreetingEndpoint()
+      'greeting': _i11.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
           null,
         ),
-      'legalClient': _i11.LegalClientEndpoint()
+      'legalClient': _i12.LegalClientEndpoint()
         ..initialize(
           server,
           'legalClient',
           null,
         ),
-      'negotiation': _i12.NegotiationEndpoint()
+      'negotiation': _i13.NegotiationEndpoint()
         ..initialize(
           server,
           'negotiation',
@@ -349,29 +358,9 @@ class Endpoints extends _i1.EndpointDispatch {
         'create': _i1.MethodConnector(
           name: 'create',
           params: {
-            'clientId': _i1.ParameterDescription(
-              name: 'clientId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'negotiationId': _i1.ParameterDescription(
-              name: 'negotiationId',
-              type: _i1.getType<int?>(),
-              nullable: true,
-            ),
-            'amountCents': _i1.ParameterDescription(
-              name: 'amountCents',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'dueDate': _i1.ParameterDescription(
-              name: 'dueDate',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'idempotencyKey': _i1.ParameterDescription(
-              name: 'idempotencyKey',
-              type: _i1.getType<String>(),
+            'request': _i1.ParameterDescription(
+              name: 'request',
+              type: _i1.getType<_i14.BillingCreateRequest>(),
               nullable: false,
             ),
           },
@@ -381,11 +370,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['billing'] as _i5.BillingEndpoint).create(
                 session,
-                params['clientId'],
-                params['negotiationId'],
-                params['amountCents'],
-                params['dueDate'],
-                params['idempotencyKey'],
+                params['request'],
               ),
         ),
         'get': _i1.MethodConnector(
@@ -406,6 +391,55 @@ class Endpoints extends _i1.EndpointDispatch {
                 params['id'],
               ),
         ),
+        'list': _i1.MethodConnector(
+          name: 'list',
+          params: {
+            'kind': _i1.ParameterDescription(
+              name: 'kind',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['billing'] as _i5.BillingEndpoint).list(
+                session,
+                params['kind'],
+                params['offset'],
+              ),
+        ),
+        'findIntent': _i1.MethodConnector(
+          name: 'findIntent',
+          params: {
+            'clientId': _i1.ParameterDescription(
+              name: 'clientId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'idempotencyKey': _i1.ParameterDescription(
+              name: 'idempotencyKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['billing'] as _i5.BillingEndpoint).findIntent(
+                    session,
+                    params['clientId'],
+                    params['idempotencyKey'],
+                  ),
+        ),
         'refresh': _i1.MethodConnector(
           name: 'refresh',
           params: {
@@ -423,6 +457,94 @@ class Endpoints extends _i1.EndpointDispatch {
                 session,
                 params['id'],
               ),
+        ),
+        'resolveCustomer': _i1.MethodConnector(
+          name: 'resolveCustomer',
+          params: {
+            'clientId': _i1.ParameterDescription(
+              name: 'clientId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['billing'] as _i5.BillingEndpoint).resolveCustomer(
+                    session,
+                    params['clientId'],
+                  ),
+        ),
+        'reconcileCustomer': _i1.MethodConnector(
+          name: 'reconcileCustomer',
+          params: {
+            'clientId': _i1.ParameterDescription(
+              name: 'clientId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['billing'] as _i5.BillingEndpoint)
+                  .reconcileCustomer(
+                    session,
+                    params['clientId'],
+                  ),
+        ),
+        'listClients': _i1.MethodConnector(
+          name: 'listClients',
+          params: {
+            'query': _i1.ParameterDescription(
+              name: 'query',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['billing'] as _i5.BillingEndpoint).listClients(
+                    session,
+                    params['query'],
+                    params['offset'],
+                  ),
+        ),
+        'listNegotiations': _i1.MethodConnector(
+          name: 'listNegotiations',
+          params: {
+            'clientId': _i1.ParameterDescription(
+              name: 'clientId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'kind': _i1.ParameterDescription(
+              name: 'kind',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['billing'] as _i5.BillingEndpoint)
+                  .listNegotiations(
+                    session,
+                    params['clientId'],
+                    params['kind'],
+                  ),
         ),
       },
     );
@@ -501,6 +623,227 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['chat'] = _i1.EndpointConnector(
+      name: 'chat',
+      endpoint: endpoints['chat']!,
+      methodConnectors: {
+        'listCreationClients': _i1.MethodConnector(
+          name: 'listCreationClients',
+          params: {
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['chat'] as _i7.ChatEndpoint).listCreationClients(
+                    session,
+                    params['offset'],
+                    params['limit'],
+                  ),
+        ),
+        'createConversation': _i1.MethodConnector(
+          name: 'createConversation',
+          params: {
+            'legalClientId': _i1.ParameterDescription(
+              name: 'legalClientId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'title': _i1.ParameterDescription(
+              name: 'title',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'requestId': _i1.ParameterDescription(
+              name: 'requestId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['chat'] as _i7.ChatEndpoint).createConversation(
+                    session,
+                    params['legalClientId'],
+                    params['title'],
+                    params['requestId'],
+                  ),
+        ),
+        'addParticipant': _i1.MethodConnector(
+          name: 'addParticipant',
+          params: {
+            'conversationId': _i1.ParameterDescription(
+              name: 'conversationId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'authUserId': _i1.ParameterDescription(
+              name: 'authUserId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['chat'] as _i7.ChatEndpoint).addParticipant(
+                session,
+                params['conversationId'],
+                params['authUserId'],
+              ),
+        ),
+        'removeParticipant': _i1.MethodConnector(
+          name: 'removeParticipant',
+          params: {
+            'conversationId': _i1.ParameterDescription(
+              name: 'conversationId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'authUserId': _i1.ParameterDescription(
+              name: 'authUserId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['chat'] as _i7.ChatEndpoint).removeParticipant(
+                    session,
+                    params['conversationId'],
+                    params['authUserId'],
+                  ),
+        ),
+        'listParticipants': _i1.MethodConnector(
+          name: 'listParticipants',
+          params: {
+            'conversationId': _i1.ParameterDescription(
+              name: 'conversationId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['chat'] as _i7.ChatEndpoint).listParticipants(
+                    session,
+                    params['conversationId'],
+                    params['offset'],
+                    params['limit'],
+                  ),
+        ),
+        'listConversations': _i1.MethodConnector(
+          name: 'listConversations',
+          params: {
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['chat'] as _i7.ChatEndpoint).listConversations(
+                    session,
+                    params['offset'],
+                    params['limit'],
+                  ),
+        ),
+        'listMessages': _i1.MethodConnector(
+          name: 'listMessages',
+          params: {
+            'conversationId': _i1.ParameterDescription(
+              name: 'conversationId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['chat'] as _i7.ChatEndpoint).listMessages(
+                session,
+                params['conversationId'],
+                params['offset'],
+                params['limit'],
+              ),
+        ),
+        'sendMessage': _i1.MethodConnector(
+          name: 'sendMessage',
+          params: {
+            'conversationId': _i1.ParameterDescription(
+              name: 'conversationId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'content': _i1.ParameterDescription(
+              name: 'content',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['chat'] as _i7.ChatEndpoint).sendMessage(
+                session,
+                params['conversationId'],
+                params['content'],
+              ),
+        ),
+      },
+    );
     connectors['contactAdmin'] = _i1.EndpointConnector(
       name: 'contactAdmin',
       endpoint: endpoints['contactAdmin']!,
@@ -519,7 +862,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['contactAdmin'] as _i7.ContactAdminEndpoint).list(
+                  (endpoints['contactAdmin'] as _i8.ContactAdminEndpoint).list(
                     session,
                     params['offset'],
                   ),
@@ -553,7 +896,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['contact'] as _i8.ContactEndpoint).submit(
+              ) async => (endpoints['contact'] as _i9.ContactEndpoint).submit(
                 session,
                 params['name'],
                 params['email'],
@@ -579,10 +922,11 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['content'] as _i9.ContentEndpoint).articles(
-                session,
-                params['offset'],
-              ),
+              ) async =>
+                  (endpoints['content'] as _i10.ContentEndpoint).articles(
+                    session,
+                    params['offset'],
+                  ),
         ),
         'partners': _i1.MethodConnector(
           name: 'partners',
@@ -597,10 +941,11 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['content'] as _i9.ContentEndpoint).partners(
-                session,
-                params['offset'],
-              ),
+              ) async =>
+                  (endpoints['content'] as _i10.ContentEndpoint).partners(
+                    session,
+                    params['offset'],
+                  ),
         ),
         'adminArticles': _i1.MethodConnector(
           name: 'adminArticles',
@@ -616,7 +961,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['content'] as _i9.ContentEndpoint).adminArticles(
+                  (endpoints['content'] as _i10.ContentEndpoint).adminArticles(
                     session,
                     params['offset'],
                   ),
@@ -635,7 +980,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['content'] as _i9.ContentEndpoint).adminPartners(
+                  (endpoints['content'] as _i10.ContentEndpoint).adminPartners(
                     session,
                     params['offset'],
                   ),
@@ -679,7 +1024,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['content'] as _i9.ContentEndpoint).saveArticle(
+                  (endpoints['content'] as _i10.ContentEndpoint).saveArticle(
                     session,
                     params['id'],
                     params['title'],
@@ -723,7 +1068,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['content'] as _i9.ContentEndpoint).savePartner(
+                  (endpoints['content'] as _i10.ContentEndpoint).savePartner(
                     session,
                     params['id'],
                     params['name'],
@@ -751,7 +1096,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i10.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i11.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
@@ -769,7 +1114,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i10.GreetingEndpoint).ola(
+              ) async => (endpoints['greeting'] as _i11.GreetingEndpoint).ola(
                 session,
                 params['name'],
               ),
@@ -794,7 +1139,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['legalClient'] as _i11.LegalClientEndpoint).list(
+                  (endpoints['legalClient'] as _i12.LegalClientEndpoint).list(
                     session,
                     params['offset'],
                   ),
@@ -828,7 +1173,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['legalClient'] as _i11.LegalClientEndpoint).create(
+                  (endpoints['legalClient'] as _i12.LegalClientEndpoint).create(
                     session,
                     params['name'],
                     params['email'],
@@ -870,7 +1215,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['legalClient'] as _i11.LegalClientEndpoint).update(
+                  (endpoints['legalClient'] as _i12.LegalClientEndpoint).update(
                     session,
                     params['id'],
                     params['name'],
@@ -897,7 +1242,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['legalClient'] as _i11.LegalClientEndpoint)
+              ) async => (endpoints['legalClient'] as _i12.LegalClientEndpoint)
                   .bindOwner(
                     session,
                     params['id'],
@@ -923,7 +1268,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['legalClient'] as _i11.LegalClientEndpoint).assign(
+                  (endpoints['legalClient'] as _i12.LegalClientEndpoint).assign(
                     session,
                     params['id'],
                     params['lawyerId'],
@@ -954,7 +1299,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['negotiation'] as _i12.NegotiationEndpoint).list(
+                  (endpoints['negotiation'] as _i13.NegotiationEndpoint).list(
                     session,
                     params['offset'],
                     params['kind'],
@@ -989,7 +1334,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['negotiation'] as _i12.NegotiationEndpoint).create(
+                  (endpoints['negotiation'] as _i13.NegotiationEndpoint).create(
                     session,
                     params['clientId'],
                     params['kind'],
@@ -1020,7 +1365,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['negotiation'] as _i12.NegotiationEndpoint)
+              ) async => (endpoints['negotiation'] as _i13.NegotiationEndpoint)
                   .transition(
                     session,
                     params['id'],
@@ -1041,7 +1386,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['negotiation'] as _i12.NegotiationEndpoint)
+              ) async => (endpoints['negotiation'] as _i13.NegotiationEndpoint)
                   .history(
                     session,
                     params['id'],
@@ -1049,9 +1394,9 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i13.Endpoints()
+    modules['serverpod_auth_idp'] = _i15.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i14.Endpoints()
+    modules['serverpod_auth_core'] = _i16.Endpoints()
       ..initializeEndpoints(server);
   }
 }

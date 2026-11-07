@@ -4,3 +4,6 @@ values:
   - awaitingProvider
   - pending
   - overdue
+  - confirmed
+  - received
+  - attention

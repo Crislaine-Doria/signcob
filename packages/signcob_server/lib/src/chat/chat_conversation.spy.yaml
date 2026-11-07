@@ -1,0 +1,15 @@
+class: ChatConversation
+table: chat_conversation
+fields:
+  title: String
+  legalClientId: int?, relation(parent=legal_client)
+  createdAt: DateTime
+  createdByAuthUserId: String?, scope=serverOnly
+  creationRequestId: String?, scope=serverOnly
+indexes:
+  chat_conversation_created_idx:
+    fields: createdAt, id
+  chat_conversation_creation_request_unique:
+    fields: createdByAuthUserId, creationRequestId
+    unique: true
+

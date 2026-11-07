@@ -19,19 +19,34 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i5;
 import 'package:signcob_server/src/generated/billing/billing_charge.dart'
     as _i6;
-import 'package:signcob_server/src/generated/cases/legal_case.dart' as _i7;
-import 'package:signcob_server/src/generated/contact/contact_message.dart'
+import 'package:signcob_server/src/generated/billing/billing_create_request.dart'
+    as _i7;
+import 'package:signcob_server/src/generated/billing/billing_customer_link.dart'
     as _i8;
-import 'package:signcob_server/src/generated/content/public_article.dart'
+import 'package:signcob_server/src/generated/billing/billing_client_option.dart'
     as _i9;
-import 'package:signcob_server/src/generated/content/public_partner.dart'
+import 'package:signcob_server/src/generated/billing/billing_negotiation_option.dart'
     as _i10;
-import 'package:signcob_server/src/generated/greetings/greeting.dart' as _i11;
-import 'package:signcob_server/src/generated/legal/legal_client.dart' as _i12;
-import 'package:signcob_server/src/generated/negotiations/negotiation.dart'
+import 'package:signcob_server/src/generated/cases/legal_case.dart' as _i11;
+import 'package:signcob_server/src/generated/chat/chat_client_option.dart'
+    as _i12;
+import 'package:signcob_server/src/generated/chat/chat_conversation.dart'
     as _i13;
-import 'package:signcob_server/src/generated/negotiations/negotiation_event.dart'
+import 'package:signcob_server/src/generated/chat/chat_participant.dart'
     as _i14;
+import 'package:signcob_server/src/generated/chat/chat_message.dart' as _i15;
+import 'package:signcob_server/src/generated/contact/contact_message.dart'
+    as _i16;
+import 'package:signcob_server/src/generated/content/public_article.dart'
+    as _i17;
+import 'package:signcob_server/src/generated/content/public_partner.dart'
+    as _i18;
+import 'package:signcob_server/src/generated/greetings/greeting.dart' as _i19;
+import 'package:signcob_server/src/generated/legal/legal_client.dart' as _i20;
+import 'package:signcob_server/src/generated/negotiations/negotiation.dart'
+    as _i21;
+import 'package:signcob_server/src/generated/negotiations/negotiation_event.dart'
+    as _i22;
 import 'package:signcob_server/src/generated/protocol.dart';
 import 'package:signcob_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -149,6 +164,8 @@ class TestEndpoints {
 
   late final _CaseRecordEndpoint caseRecord;
 
+  late final _ChatEndpoint chat;
+
   late final _ContactAdminEndpoint contactAdmin;
 
   late final _ContactEndpoint contact;
@@ -186,6 +203,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     caseRecord = _CaseRecordEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    chat = _ChatEndpoint(
       endpoints,
       serializationManager,
     );
@@ -595,11 +616,7 @@ class _BillingEndpoint {
 
   _i3.Future<_i6.BillingCharge> create(
     _i1.TestSessionBuilder sessionBuilder,
-    int clientId,
-    int? negotiationId,
-    int amountCents,
-    String dueDate,
-    String idempotencyKey,
+    _i7.BillingCreateRequest request,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -612,13 +629,7 @@ class _BillingEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'billing',
           methodName: 'create',
-          parameters: _i1.testObjectToJson({
-            'clientId': clientId,
-            'negotiationId': negotiationId,
-            'amountCents': amountCents,
-            'dueDate': dueDate,
-            'idempotencyKey': idempotencyKey,
-          }),
+          parameters: _i1.testObjectToJson({'request': request}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -665,6 +676,76 @@ class _BillingEndpoint {
     });
   }
 
+  _i3.Future<List<_i6.BillingCharge>> list(
+    _i1.TestSessionBuilder sessionBuilder,
+    String kind,
+    int offset,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'list',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'list',
+          parameters: _i1.testObjectToJson({
+            'kind': kind,
+            'offset': offset,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i6.BillingCharge>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i6.BillingCharge?> findIntent(
+    _i1.TestSessionBuilder sessionBuilder,
+    int clientId,
+    String idempotencyKey,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'findIntent',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'findIntent',
+          parameters: _i1.testObjectToJson({
+            'clientId': clientId,
+            'idempotencyKey': idempotencyKey,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i6.BillingCharge?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _i3.Future<_i6.BillingCharge> refresh(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
@@ -695,6 +776,138 @@ class _BillingEndpoint {
       }
     });
   }
+
+  _i3.Future<_i8.BillingCustomerLink> resolveCustomer(
+    _i1.TestSessionBuilder sessionBuilder,
+    int clientId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'resolveCustomer',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'resolveCustomer',
+          parameters: _i1.testObjectToJson({'clientId': clientId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i8.BillingCustomerLink>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i8.BillingCustomerLink> reconcileCustomer(
+    _i1.TestSessionBuilder sessionBuilder,
+    int clientId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'reconcileCustomer',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'reconcileCustomer',
+          parameters: _i1.testObjectToJson({'clientId': clientId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i8.BillingCustomerLink>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i9.BillingClientOption>> listClients(
+    _i1.TestSessionBuilder sessionBuilder,
+    String query,
+    int offset,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'listClients',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'listClients',
+          parameters: _i1.testObjectToJson({
+            'query': query,
+            'offset': offset,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i9.BillingClientOption>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i10.BillingNegotiationOption>> listNegotiations(
+    _i1.TestSessionBuilder sessionBuilder,
+    int clientId,
+    String kind,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'listNegotiations',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'listNegotiations',
+          parameters: _i1.testObjectToJson({
+            'clientId': clientId,
+            'kind': kind,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i10.BillingNegotiationOption>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _CaseRecordEndpoint {
@@ -707,7 +920,7 @@ class _CaseRecordEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i7.LegalCase>> list(
+  _i3.Future<List<_i11.LegalCase>> list(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -730,7 +943,7 @@ class _CaseRecordEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i7.LegalCase>>);
+                as _i3.Future<List<_i11.LegalCase>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -738,7 +951,7 @@ class _CaseRecordEndpoint {
     });
   }
 
-  _i3.Future<_i7.LegalCase> importFromDataJud(
+  _i3.Future<_i11.LegalCase> importFromDataJud(
     _i1.TestSessionBuilder sessionBuilder,
     int clientId,
     String tribunal,
@@ -767,7 +980,7 @@ class _CaseRecordEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.LegalCase>);
+                as _i3.Future<_i11.LegalCase>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -775,7 +988,7 @@ class _CaseRecordEndpoint {
     });
   }
 
-  _i3.Future<_i7.LegalCase> sync(
+  _i3.Future<_i11.LegalCase> sync(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
   ) async {
@@ -798,7 +1011,304 @@ class _CaseRecordEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.LegalCase>);
+                as _i3.Future<_i11.LegalCase>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _ChatEndpoint {
+  _ChatEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i12.ChatClientOption>> listCreationClients(
+    _i1.TestSessionBuilder sessionBuilder,
+    int offset,
+    int limit,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'listCreationClients',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'listCreationClients',
+          parameters: _i1.testObjectToJson({
+            'offset': offset,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i12.ChatClientOption>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i13.ChatConversation> createConversation(
+    _i1.TestSessionBuilder sessionBuilder,
+    int legalClientId,
+    String title,
+    String requestId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'createConversation',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'createConversation',
+          parameters: _i1.testObjectToJson({
+            'legalClientId': legalClientId,
+            'title': title,
+            'requestId': requestId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i13.ChatConversation>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i14.ChatParticipant> addParticipant(
+    _i1.TestSessionBuilder sessionBuilder,
+    int conversationId,
+    String authUserId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'addParticipant',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'addParticipant',
+          parameters: _i1.testObjectToJson({
+            'conversationId': conversationId,
+            'authUserId': authUserId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i14.ChatParticipant>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> removeParticipant(
+    _i1.TestSessionBuilder sessionBuilder,
+    int conversationId,
+    String authUserId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'removeParticipant',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'removeParticipant',
+          parameters: _i1.testObjectToJson({
+            'conversationId': conversationId,
+            'authUserId': authUserId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i14.ChatParticipant>> listParticipants(
+    _i1.TestSessionBuilder sessionBuilder,
+    int conversationId,
+    int offset,
+    int limit,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'listParticipants',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'listParticipants',
+          parameters: _i1.testObjectToJson({
+            'conversationId': conversationId,
+            'offset': offset,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i14.ChatParticipant>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i13.ChatConversation>> listConversations(
+    _i1.TestSessionBuilder sessionBuilder,
+    int offset,
+    int limit,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'listConversations',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'listConversations',
+          parameters: _i1.testObjectToJson({
+            'offset': offset,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i13.ChatConversation>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i15.ChatMessage>> listMessages(
+    _i1.TestSessionBuilder sessionBuilder,
+    int conversationId,
+    int offset,
+    int limit,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'listMessages',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'listMessages',
+          parameters: _i1.testObjectToJson({
+            'conversationId': conversationId,
+            'offset': offset,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i15.ChatMessage>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i15.ChatMessage> sendMessage(
+    _i1.TestSessionBuilder sessionBuilder,
+    int conversationId,
+    String content,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'chat',
+            method: 'sendMessage',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'chat',
+          methodName: 'sendMessage',
+          parameters: _i1.testObjectToJson({
+            'conversationId': conversationId,
+            'content': content,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i15.ChatMessage>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -817,7 +1327,7 @@ class _ContactAdminEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i8.ContactMessage>> list(
+  _i3.Future<List<_i16.ContactMessage>> list(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -840,7 +1350,7 @@ class _ContactAdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i8.ContactMessage>>);
+                as _i3.Future<List<_i16.ContactMessage>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -907,7 +1417,7 @@ class _ContentEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i9.PublicArticle>> articles(
+  _i3.Future<List<_i17.PublicArticle>> articles(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -930,7 +1440,7 @@ class _ContentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i9.PublicArticle>>);
+                as _i3.Future<List<_i17.PublicArticle>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -938,7 +1448,7 @@ class _ContentEndpoint {
     });
   }
 
-  _i3.Future<List<_i10.PublicPartner>> partners(
+  _i3.Future<List<_i18.PublicPartner>> partners(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -961,7 +1471,7 @@ class _ContentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i10.PublicPartner>>);
+                as _i3.Future<List<_i18.PublicPartner>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -969,7 +1479,7 @@ class _ContentEndpoint {
     });
   }
 
-  _i3.Future<List<_i9.PublicArticle>> adminArticles(
+  _i3.Future<List<_i17.PublicArticle>> adminArticles(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -992,7 +1502,7 @@ class _ContentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i9.PublicArticle>>);
+                as _i3.Future<List<_i17.PublicArticle>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1000,7 +1510,7 @@ class _ContentEndpoint {
     });
   }
 
-  _i3.Future<List<_i10.PublicPartner>> adminPartners(
+  _i3.Future<List<_i18.PublicPartner>> adminPartners(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -1023,7 +1533,7 @@ class _ContentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i10.PublicPartner>>);
+                as _i3.Future<List<_i18.PublicPartner>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1031,7 +1541,7 @@ class _ContentEndpoint {
     });
   }
 
-  _i3.Future<_i9.PublicArticle> saveArticle(
+  _i3.Future<_i17.PublicArticle> saveArticle(
     _i1.TestSessionBuilder sessionBuilder,
     int? id,
     String title,
@@ -1066,7 +1576,7 @@ class _ContentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i9.PublicArticle>);
+                as _i3.Future<_i17.PublicArticle>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1074,7 +1584,7 @@ class _ContentEndpoint {
     });
   }
 
-  _i3.Future<_i10.PublicPartner> savePartner(
+  _i3.Future<_i18.PublicPartner> savePartner(
     _i1.TestSessionBuilder sessionBuilder,
     int? id,
     String name,
@@ -1107,7 +1617,7 @@ class _ContentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i10.PublicPartner>);
+                as _i3.Future<_i18.PublicPartner>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1126,7 +1636,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i11.Greeting> hello(
+  _i3.Future<_i19.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -1149,7 +1659,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i11.Greeting>);
+                as _i3.Future<_i19.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1157,7 +1667,7 @@ class _GreetingEndpoint {
     });
   }
 
-  _i3.Future<_i11.Greeting> ola(
+  _i3.Future<_i19.Greeting> ola(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -1180,7 +1690,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i11.Greeting>);
+                as _i3.Future<_i19.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1199,7 +1709,7 @@ class _LegalClientEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i12.LegalClient>> list(
+  _i3.Future<List<_i20.LegalClient>> list(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
   ) async {
@@ -1222,7 +1732,7 @@ class _LegalClientEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i12.LegalClient>>);
+                as _i3.Future<List<_i20.LegalClient>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1230,7 +1740,7 @@ class _LegalClientEndpoint {
     });
   }
 
-  _i3.Future<_i12.LegalClient> create(
+  _i3.Future<_i20.LegalClient> create(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
     String? email,
@@ -1261,7 +1771,7 @@ class _LegalClientEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i12.LegalClient>);
+                as _i3.Future<_i20.LegalClient>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1269,7 +1779,7 @@ class _LegalClientEndpoint {
     });
   }
 
-  _i3.Future<_i12.LegalClient> update(
+  _i3.Future<_i20.LegalClient> update(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
     String name,
@@ -1302,7 +1812,7 @@ class _LegalClientEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i12.LegalClient>);
+                as _i3.Future<_i20.LegalClient>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1310,7 +1820,7 @@ class _LegalClientEndpoint {
     });
   }
 
-  _i3.Future<_i12.LegalClient> bindOwner(
+  _i3.Future<_i20.LegalClient> bindOwner(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
     String? authUserId,
@@ -1337,7 +1847,7 @@ class _LegalClientEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i12.LegalClient>);
+                as _i3.Future<_i20.LegalClient>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1345,7 +1855,7 @@ class _LegalClientEndpoint {
     });
   }
 
-  _i3.Future<_i12.LegalClient> assign(
+  _i3.Future<_i20.LegalClient> assign(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
     String? lawyerId,
@@ -1372,7 +1882,7 @@ class _LegalClientEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i12.LegalClient>);
+                as _i3.Future<_i20.LegalClient>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1391,7 +1901,7 @@ class _NegotiationEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i13.Negotiation>> list(
+  _i3.Future<List<_i21.Negotiation>> list(
     _i1.TestSessionBuilder sessionBuilder,
     int offset,
     String kind,
@@ -1418,7 +1928,7 @@ class _NegotiationEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i13.Negotiation>>);
+                as _i3.Future<List<_i21.Negotiation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1426,7 +1936,7 @@ class _NegotiationEndpoint {
     });
   }
 
-  _i3.Future<_i13.Negotiation> create(
+  _i3.Future<_i21.Negotiation> create(
     _i1.TestSessionBuilder sessionBuilder,
     int clientId,
     String kind,
@@ -1457,7 +1967,7 @@ class _NegotiationEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.Negotiation>);
+                as _i3.Future<_i21.Negotiation>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1465,7 +1975,7 @@ class _NegotiationEndpoint {
     });
   }
 
-  _i3.Future<_i13.Negotiation> transition(
+  _i3.Future<_i21.Negotiation> transition(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
     String toStatus,
@@ -1494,7 +2004,7 @@ class _NegotiationEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.Negotiation>);
+                as _i3.Future<_i21.Negotiation>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1502,7 +2012,7 @@ class _NegotiationEndpoint {
     });
   }
 
-  _i3.Future<List<_i14.NegotiationEvent>> history(
+  _i3.Future<List<_i22.NegotiationEvent>> history(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
   ) async {
@@ -1525,7 +2035,7 @@ class _NegotiationEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i14.NegotiationEvent>>);
+                as _i3.Future<List<_i22.NegotiationEvent>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

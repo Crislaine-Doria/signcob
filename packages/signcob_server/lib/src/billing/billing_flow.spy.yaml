@@ -1,0 +1,6 @@
+enum: BillingFlow
+serialized: byName
+values:
+  - single
+  - installment
+  - recurring

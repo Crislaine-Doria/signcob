@@ -1,0 +1,6 @@
+enum: BillingMethod
+serialized: byName
+values:
+  - pix
+  - boleto
+  - card

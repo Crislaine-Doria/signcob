@@ -1,0 +1,11 @@
+class: ChatMessage
+table: chat_message
+fields:
+  conversationId: int, relation(parent=chat_conversation)
+  authorAuthUserId: String
+  content: String
+  createdAt: DateTime
+indexes:
+  chat_message_conversation_page_idx:
+    fields: conversationId, createdAt, id
+

@@ -1,0 +1,4 @@
+class: ChatClientOption
+fields:
+  legalClientId: int
+  name: String

@@ -1,0 +1,24 @@
+class: BillingCustomerRecord
+serverOnly: true
+table: billing_customer
+fields:
+  environment: String
+  accountId: String
+  legalClientId: int, relation(parent=legal_client)
+  document: String
+  externalReference: String
+  providerCustomerId: String?
+  state: String
+  createAttempted: bool
+  createdAt: DateTime
+  updatedAt: DateTime
+indexes:
+  billing_customer_client_idx:
+    fields: environment, accountId, legalClientId
+    unique: true
+  billing_customer_document_idx:
+    fields: environment, accountId, document
+    unique: true
+  billing_customer_provider_idx:
+    fields: environment, accountId, providerCustomerId
+    unique: true

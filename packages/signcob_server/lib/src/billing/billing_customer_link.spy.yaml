@@ -1,0 +1,4 @@
+class: BillingCustomerLink
+fields:
+  clientId: int
+  state: String

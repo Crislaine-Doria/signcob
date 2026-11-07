@@ -1,0 +1,5 @@
+class: BillingNegotiationOption
+fields:
+  id: int
+  title: String
+  amountCents: int

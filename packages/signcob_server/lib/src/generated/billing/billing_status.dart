@@ -15,7 +15,10 @@ import 'package:serverpod/serverpod.dart' as _i1;
 enum BillingStatus implements _i1.SerializableModel {
   awaitingProvider,
   pending,
-  overdue;
+  overdue,
+  confirmed,
+  received,
+  attention;
 
   static BillingStatus fromJson(String name) {
     switch (name) {
@@ -25,6 +28,12 @@ enum BillingStatus implements _i1.SerializableModel {
         return BillingStatus.pending;
       case 'overdue':
         return BillingStatus.overdue;
+      case 'confirmed':
+        return BillingStatus.confirmed;
+      case 'received':
+        return BillingStatus.received;
+      case 'attention':
+        return BillingStatus.attention;
       default:
         throw ArgumentError(
           'Value "$name" cannot be converted to "BillingStatus"',

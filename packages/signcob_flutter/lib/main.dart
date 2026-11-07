@@ -14,6 +14,9 @@ import 'screens/admin_cases_screen.dart';
 import 'screens/sign_in_screen.dart';
 import 'screens/content_screen.dart';
 import 'screens/admin_negotiations_screen.dart';
+import 'screens/admin_billing_screen.dart';
+import 'screens/admin_chat_screen.dart';
+import 'screens/chat_provisioning_panel.dart';
 import 'screens/calculators/work_accident_screen.dart';
 import 'screens/privacy_screen.dart';
 import 'theme/signcob_theme.dart';
@@ -69,6 +72,95 @@ class MyApp extends StatelessWidget {
         ),
         '/administrativo': (_) => SignInScreen(
           child: AdminDashboardScreen(
+            chat: AdminChatScreen(
+              sessionIdentity: client.auth.authInfo?.authUserId,
+              loadConversations: (offset) async {
+                final rows = await client.chat.listConversations(
+                  offset,
+                  chatPageSize,
+                );
+                return rows
+                    .map(
+                      (row) => ChatConversationItem(
+                        id: row.id!,
+                        title: row.title,
+                        updatedAt: row.createdAt,
+                      ),
+                    )
+                    .toList(growable: false);
+              },
+              loadMessages: (conversationId, offset) async {
+                final currentUser = client.auth.authInfo?.authUserId.toString();
+                final rows = await client.chat.listMessages(
+                  conversationId,
+                  offset,
+                  chatPageSize,
+                );
+                return rows
+                    .map(
+                      (row) => ChatMessageItem(
+                        id: row.id!,
+                        authorLabel: row.authorAuthUserId == currentUser
+                            ? 'Você'
+                            : 'Participante',
+                        content: row.content,
+                        createdAt: row.createdAt,
+                        isCurrentUser: row.authorAuthUserId == currentUser,
+                      ),
+                    )
+                    .toList(growable: false);
+              },
+              sendMessage: (conversationId, content) async {
+                final currentUser = client.auth.authInfo?.authUserId.toString();
+                final row = await client.chat.sendMessage(
+                  conversationId,
+                  content,
+                );
+                return ChatMessageItem(
+                  id: row.id!,
+                  authorLabel: row.authorAuthUserId == currentUser
+                      ? 'Você'
+                      : 'Participante',
+                  content: row.content,
+                  createdAt: row.createdAt,
+                  isCurrentUser: row.authorAuthUserId == currentUser,
+                );
+              },
+              provisioning: ServerpodChatProvisioning(client),
+            ),
+            mayReadBilling: () =>
+                client.auth.authInfo?.scopeNames.contains('billing.read') ??
+                false,
+            billingDebts: AdminBillingScreen(
+              key: const ValueKey('billing-debt'),
+              kind: 'debt',
+              mayWrite: () =>
+                  client.auth.authInfo?.scopeNames.contains('billing.write') ??
+                  false,
+              loadCharges: client.billing.list,
+              createCharge: client.billing.create,
+              findIntent: client.billing.findIntent,
+              getCharge: client.billing.get,
+              refreshCharge: client.billing.refresh,
+              reconcileCustomer: client.billing.reconcileCustomer,
+              loadClients: client.billing.listClients,
+              loadNegotiations: client.billing.listNegotiations,
+            ),
+            billingFees: AdminBillingScreen(
+              key: const ValueKey('billing-fees'),
+              kind: 'fees',
+              mayWrite: () =>
+                  client.auth.authInfo?.scopeNames.contains('billing.write') ??
+                  false,
+              loadCharges: client.billing.list,
+              createCharge: client.billing.create,
+              findIntent: client.billing.findIntent,
+              getCharge: client.billing.get,
+              refreshCharge: client.billing.refresh,
+              reconcileCustomer: client.billing.reconcileCustomer,
+              loadClients: client.billing.listClients,
+              loadNegotiations: client.billing.listNegotiations,
+            ),
             debts: AdminNegotiationsScreen(
               key: const ValueKey('negotiations-debt'),
               kind: 'debt',

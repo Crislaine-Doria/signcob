@@ -14,6 +14,10 @@ class AccessAdminEndpoint extends Endpoint {
     'cases.read',
     'cases.write',
     'content.write',
+    'chat.partner',
+    'chat.lawyer',
+    'chat.support',
+    'chat.client',
   };
   @override
   bool get requireLogin => true;

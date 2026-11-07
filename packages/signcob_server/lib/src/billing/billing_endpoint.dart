@@ -3,12 +3,14 @@ import 'package:serverpod/serverpod.dart';
 import '../access/current_permission.dart';
 import '../generated/protocol.dart';
 import 'asaas_sandbox_provider.dart';
+import 'billing_charge_service.dart';
+import 'billing_customer_service.dart';
 import 'billing_provider.dart';
+import 'billing_validation.dart';
 
 class BillingEndpoint extends Endpoint {
   BillingEndpoint({BillingProvider? provider})
     : _provider = provider ?? AsaasSandboxProvider.fromEnvironment();
-
   final BillingProvider _provider;
 
   @override
@@ -19,150 +21,122 @@ class BillingEndpoint extends Endpoint {
 
   Future<BillingCharge> create(
     Session session,
-    int clientId,
-    int? negotiationId,
-    int amountCents,
-    String dueDate,
-    String idempotencyKey,
+    BillingCreateRequest request,
   ) async {
     await _authorize(session, write: true);
-    final parsedDate = DateTime.tryParse('${dueDate}T00:00:00Z');
-    if (amountCents <= 0 ||
-        amountCents > 9000000000000 ||
-        !RegExp(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$').hasMatch(dueDate) ||
-        parsedDate?.toIso8601String().split('T').first != dueDate ||
-        dueDate.startsWith('0000') ||
-        !RegExp(r'^[A-Za-z0-9_-]{1,128}$').hasMatch(idempotencyKey)) {
-      throw BillingException(
-        code: 'invalid_input',
-        message: 'Dados da cobrança inválidos.',
-      );
-    }
-
-    final (record, reserved) = await session.db.transaction((tx) async {
-      // The existing client row serializes claims of a key for this client.
-      final client = await session.db.unsafeQuery(
-        'SELECT id FROM legal_client WHERE id = @id FOR UPDATE',
-        parameters: QueryParameters.named({'id': clientId}),
-        transaction: tx,
-      );
-      if (client.isEmpty) {
-        throw _accessDenied();
-      }
-      final existing = await BillingChargeRecord.db.findFirstRow(
-        session,
-        where: (table) =>
-            table.legalClientId.equals(clientId) &
-            table.idempotencyKey.equals(idempotencyKey),
-        transaction: tx,
-      );
-      if (existing != null) {
-        if (existing.amountCents != amountCents ||
-            existing.dueDate != dueDate ||
-            existing.negotiationId != negotiationId) {
-          throw BillingException(
-            code: 'idempotency_conflict',
-            message: 'Chave de idempotência já usada com outros dados.',
-          );
-        }
-        return (existing, false);
-      }
-      if (negotiationId != null) {
-        final negotiation = await Negotiation.db.findById(
-          session,
-          negotiationId,
-          transaction: tx,
-        );
-        if (negotiation?.legalClientId != clientId) {
-          throw _accessDenied();
-        }
-      }
-      _provider.ensureCreationAvailable();
-      final now = DateTime.now().toUtc();
-      final row = await BillingChargeRecord.db.insertRow(
-        session,
-        BillingChargeRecord(
-          legalClientId: clientId,
-          negotiationId: negotiationId,
-          idempotencyKey: idempotencyKey,
-          amountCents: amountCents,
-          dueDate: dueDate,
-          status: BillingStatus.awaitingProvider,
-          createdAt: now,
-          updatedAt: now,
-        ),
-        transaction: tx,
-      );
-      return (row, true);
-    });
-    if (!reserved) {
-      return _toCharge(record);
-    }
-
-    // A crash after this point leaves the durable claim for reconciliation.
-    // Never resend a claim that might have reached the provider.
-    try {
-      final result = await _provider.create(_toCharge(record));
-      if (result.id.isEmpty || result.status != BillingStatus.pending) {
-        throw StateError('Resposta inválida na criação.');
-      }
-      final updated = await BillingChargeRecord.db.updateRow(
-        session,
-        record.copyWith(
-          providerId: result.id,
-          status: result.status,
-          updatedAt: DateTime.now().toUtc(),
-        ),
-      );
-      return _toCharge(updated);
-    } catch (_) {
-      throw BillingException(
-        code: 'creation_uncertain',
-        message: 'Resultado da criação pendente de conciliação.',
-      );
-    }
+    return BillingChargeService(_provider).create(session, request);
   }
 
   Future<BillingCharge> get(Session session, int id) async {
     await _authorize(session);
-    return _toCharge(await _getRecord(session, id));
+    return BillingChargeService(_provider).get(session, id);
+  }
+
+  Future<List<BillingCharge>> list(
+    Session session,
+    String kind,
+    int offset,
+  ) async {
+    await _authorize(session);
+    return BillingChargeService(_provider).list(session, kind, offset);
+  }
+
+  Future<BillingCharge?> findIntent(
+    Session session,
+    int clientId,
+    String idempotencyKey,
+  ) async {
+    await _authorize(session);
+    return BillingChargeService(
+      _provider,
+    ).find(session, clientId, idempotencyKey);
   }
 
   Future<BillingCharge> refresh(Session session, int id) async {
     await _authorize(session, write: true);
-    return session.db.transaction((tx) async {
-      // Serialize observations for this charge to prevent stale updates.
-      await session.db.unsafeQuery(
-        'SELECT id FROM billing_charge WHERE id = @id FOR UPDATE',
-        parameters: QueryParameters.named({'id': id}),
-        transaction: tx,
-      );
-      final record = await _getRecord(session, id, transaction: tx);
-      final providerId = record.providerId;
-      if (providerId == null) {
-        throw BillingException(
-          code: 'creation_uncertain',
-          message: 'Resultado da criação pendente de conciliação.',
-        );
-      }
-      final status = await _provider.fetchStatus(providerId);
-      if (status == record.status) {
-        return _toCharge(record);
-      }
-      if (record.status != BillingStatus.pending ||
-          status != BillingStatus.overdue) {
-        throw BillingException(
-          code: 'invalid_transition',
-          message: 'Transição de cobrança inválida.',
-        );
-      }
-      final updated = await BillingChargeRecord.db.updateRow(
-        session,
-        record.copyWith(status: status, updatedAt: DateTime.now().toUtc()),
-        transaction: tx,
-      );
-      return _toCharge(updated);
-    });
+    return BillingChargeService(_provider).refresh(session, id);
+  }
+
+  Future<BillingCustomerLink> resolveCustomer(
+    Session session,
+    int clientId,
+  ) async {
+    await _authorize(session, write: true);
+    final record = await BillingCustomerService(
+      _provider,
+    ).resolve(session, clientId);
+    return BillingCustomerLink(clientId: clientId, state: record.state);
+  }
+
+  Future<BillingCustomerLink> reconcileCustomer(
+    Session session,
+    int clientId,
+  ) async {
+    await _authorize(session, write: true);
+    final record = await BillingCustomerService(
+      _provider,
+    ).reconcile(session, clientId);
+    return BillingCustomerLink(clientId: clientId, state: record.state);
+  }
+
+  Future<List<BillingClientOption>> listClients(
+    Session session,
+    String query,
+    int offset,
+  ) async {
+    await _authorize(session);
+    if (query.length > 120 || offset < 0 || offset > 1000000) {
+      throw billingError('invalid_input', 'Filtro de clientes inválido.');
+    }
+    final clients = await LegalClient.db.find(
+      session,
+      where: (row) => row.name.ilike('%${query.trim()}%'),
+      orderBy: (row) => row.id,
+      limit: 25,
+      offset: offset,
+    );
+    return clients
+        .map(
+          (client) => BillingClientOption(
+            id: client.id!,
+            name: client.name,
+            readyForBilling:
+                client.name.trim().isNotEmpty &&
+                billingDocument(client.document) != null,
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<BillingNegotiationOption>> listNegotiations(
+    Session session,
+    int clientId,
+    String kind,
+  ) async {
+    await _authorize(session);
+    if (!{'debt', 'fees'}.contains(kind)) {
+      throw billingError('invalid_input', 'Módulo de cobrança inválido.');
+    }
+    if (await LegalClient.db.findById(session, clientId) == null) {
+      throw _accessDenied();
+    }
+    final rows = await Negotiation.db.find(
+      session,
+      where: (row) =>
+          row.legalClientId.equals(clientId) & row.kind.equals(kind),
+      orderBy: (row) => row.id,
+      orderDescending: true,
+      limit: 100,
+    );
+    return rows
+        .map(
+          (row) => BillingNegotiationOption(
+            id: row.id!,
+            title: row.title,
+            amountCents: row.amountCents,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _authorize(Session session, {bool write = false}) async {
@@ -173,38 +147,9 @@ class BillingEndpoint extends Endpoint {
       throw _accessDenied();
     }
     await requireCurrentPermission(session, 'billing.read');
-    if (write) {
-      await requireCurrentPermission(session, 'billing.write');
-    }
-  }
-
-  Future<BillingChargeRecord> _getRecord(
-    Session session,
-    int id, {
-    Transaction? transaction,
-  }) async {
-    final record = await BillingChargeRecord.db.findById(
-      session,
-      id,
-      transaction: transaction,
-    );
-    if (record == null) {
-      throw _accessDenied();
-    }
-    return record;
+    if (write) await requireCurrentPermission(session, 'billing.write');
   }
 
   AccessDeniedException _accessDenied() =>
       AccessDeniedException(message: 'Cobrança indisponível para esta conta.');
-
-  BillingCharge _toCharge(BillingChargeRecord row) => BillingCharge(
-    id: row.id!,
-    legalClientId: row.legalClientId,
-    negotiationId: row.negotiationId,
-    amountCents: row.amountCents,
-    dueDate: row.dueDate,
-    status: row.status,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-  );
 }

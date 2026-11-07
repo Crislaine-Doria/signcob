@@ -12,6 +12,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../billing/billing_status.dart' as _i2;
+import '../billing/billing_method.dart' as _i3;
+import '../billing/billing_flow.dart' as _i4;
+import '../billing/billing_cycle.dart' as _i5;
 
 abstract class BillingChargeRecord
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -26,6 +29,19 @@ abstract class BillingChargeRecord
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.environment,
+    this.accountId,
+    this.kind,
+    this.method,
+    this.flow,
+    this.installmentCount,
+    this.cycle,
+    this.providerCustomerId,
+    this.externalReference,
+    this.providerGroupId,
+    this.creationState,
+    this.createAttempted,
+    this.subscriptionStatus,
   });
 
   factory BillingChargeRecord({
@@ -39,6 +55,19 @@ abstract class BillingChargeRecord
     required _i2.BillingStatus status,
     required DateTime createdAt,
     required DateTime updatedAt,
+    String? environment,
+    String? accountId,
+    String? kind,
+    _i3.BillingMethod? method,
+    _i4.BillingFlow? flow,
+    int? installmentCount,
+    _i5.BillingCycle? cycle,
+    String? providerCustomerId,
+    String? externalReference,
+    String? providerGroupId,
+    String? creationState,
+    bool? createAttempted,
+    String? subscriptionStatus,
   }) = _BillingChargeRecordImpl;
 
   factory BillingChargeRecord.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -59,6 +88,25 @@ abstract class BillingChargeRecord
       updatedAt: _i1.DateTimeJsonExtension.fromJson(
         jsonSerialization['updatedAt'],
       ),
+      environment: jsonSerialization['environment'] as String?,
+      accountId: jsonSerialization['accountId'] as String?,
+      kind: jsonSerialization['kind'] as String?,
+      method: jsonSerialization['method'] == null
+          ? null
+          : _i3.BillingMethod.fromJson((jsonSerialization['method'] as String)),
+      flow: jsonSerialization['flow'] == null
+          ? null
+          : _i4.BillingFlow.fromJson((jsonSerialization['flow'] as String)),
+      installmentCount: jsonSerialization['installmentCount'] as int?,
+      cycle: jsonSerialization['cycle'] == null
+          ? null
+          : _i5.BillingCycle.fromJson((jsonSerialization['cycle'] as String)),
+      providerCustomerId: jsonSerialization['providerCustomerId'] as String?,
+      externalReference: jsonSerialization['externalReference'] as String?,
+      providerGroupId: jsonSerialization['providerGroupId'] as String?,
+      creationState: jsonSerialization['creationState'] as String?,
+      createAttempted: jsonSerialization['createAttempted'] as bool?,
+      subscriptionStatus: jsonSerialization['subscriptionStatus'] as String?,
     );
   }
 
@@ -87,6 +135,32 @@ abstract class BillingChargeRecord
 
   DateTime updatedAt;
 
+  String? environment;
+
+  String? accountId;
+
+  String? kind;
+
+  _i3.BillingMethod? method;
+
+  _i4.BillingFlow? flow;
+
+  int? installmentCount;
+
+  _i5.BillingCycle? cycle;
+
+  String? providerCustomerId;
+
+  String? externalReference;
+
+  String? providerGroupId;
+
+  String? creationState;
+
+  bool? createAttempted;
+
+  String? subscriptionStatus;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -104,6 +178,19 @@ abstract class BillingChargeRecord
     _i2.BillingStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? environment,
+    String? accountId,
+    String? kind,
+    _i3.BillingMethod? method,
+    _i4.BillingFlow? flow,
+    int? installmentCount,
+    _i5.BillingCycle? cycle,
+    String? providerCustomerId,
+    String? externalReference,
+    String? providerGroupId,
+    String? creationState,
+    bool? createAttempted,
+    String? subscriptionStatus,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -119,6 +206,19 @@ abstract class BillingChargeRecord
       'status': status.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
+      if (environment != null) 'environment': environment,
+      if (accountId != null) 'accountId': accountId,
+      if (kind != null) 'kind': kind,
+      if (method != null) 'method': method?.toJson(),
+      if (flow != null) 'flow': flow?.toJson(),
+      if (installmentCount != null) 'installmentCount': installmentCount,
+      if (cycle != null) 'cycle': cycle?.toJson(),
+      if (providerCustomerId != null) 'providerCustomerId': providerCustomerId,
+      if (externalReference != null) 'externalReference': externalReference,
+      if (providerGroupId != null) 'providerGroupId': providerGroupId,
+      if (creationState != null) 'creationState': creationState,
+      if (createAttempted != null) 'createAttempted': createAttempted,
+      if (subscriptionStatus != null) 'subscriptionStatus': subscriptionStatus,
     };
   }
 
@@ -171,6 +271,19 @@ class _BillingChargeRecordImpl extends BillingChargeRecord {
     required _i2.BillingStatus status,
     required DateTime createdAt,
     required DateTime updatedAt,
+    String? environment,
+    String? accountId,
+    String? kind,
+    _i3.BillingMethod? method,
+    _i4.BillingFlow? flow,
+    int? installmentCount,
+    _i5.BillingCycle? cycle,
+    String? providerCustomerId,
+    String? externalReference,
+    String? providerGroupId,
+    String? creationState,
+    bool? createAttempted,
+    String? subscriptionStatus,
   }) : super._(
          id: id,
          legalClientId: legalClientId,
@@ -182,6 +295,19 @@ class _BillingChargeRecordImpl extends BillingChargeRecord {
          status: status,
          createdAt: createdAt,
          updatedAt: updatedAt,
+         environment: environment,
+         accountId: accountId,
+         kind: kind,
+         method: method,
+         flow: flow,
+         installmentCount: installmentCount,
+         cycle: cycle,
+         providerCustomerId: providerCustomerId,
+         externalReference: externalReference,
+         providerGroupId: providerGroupId,
+         creationState: creationState,
+         createAttempted: createAttempted,
+         subscriptionStatus: subscriptionStatus,
        );
 
   /// Returns a shallow copy of this [BillingChargeRecord]
@@ -199,6 +325,19 @@ class _BillingChargeRecordImpl extends BillingChargeRecord {
     _i2.BillingStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Object? environment = _Undefined,
+    Object? accountId = _Undefined,
+    Object? kind = _Undefined,
+    Object? method = _Undefined,
+    Object? flow = _Undefined,
+    Object? installmentCount = _Undefined,
+    Object? cycle = _Undefined,
+    Object? providerCustomerId = _Undefined,
+    Object? externalReference = _Undefined,
+    Object? providerGroupId = _Undefined,
+    Object? creationState = _Undefined,
+    Object? createAttempted = _Undefined,
+    Object? subscriptionStatus = _Undefined,
   }) {
     return BillingChargeRecord(
       id: id is int? ? id : this.id,
@@ -211,6 +350,33 @@ class _BillingChargeRecordImpl extends BillingChargeRecord {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      environment: environment is String? ? environment : this.environment,
+      accountId: accountId is String? ? accountId : this.accountId,
+      kind: kind is String? ? kind : this.kind,
+      method: method is _i3.BillingMethod? ? method : this.method,
+      flow: flow is _i4.BillingFlow? ? flow : this.flow,
+      installmentCount: installmentCount is int?
+          ? installmentCount
+          : this.installmentCount,
+      cycle: cycle is _i5.BillingCycle? ? cycle : this.cycle,
+      providerCustomerId: providerCustomerId is String?
+          ? providerCustomerId
+          : this.providerCustomerId,
+      externalReference: externalReference is String?
+          ? externalReference
+          : this.externalReference,
+      providerGroupId: providerGroupId is String?
+          ? providerGroupId
+          : this.providerGroupId,
+      creationState: creationState is String?
+          ? creationState
+          : this.creationState,
+      createAttempted: createAttempted is bool?
+          ? createAttempted
+          : this.createAttempted,
+      subscriptionStatus: subscriptionStatus is String?
+          ? subscriptionStatus
+          : this.subscriptionStatus,
     );
   }
 }
@@ -268,6 +434,82 @@ class BillingChargeRecordUpdateTable
         table.updatedAt,
         value,
       );
+
+  _i1.ColumnValue<String, String> environment(String? value) => _i1.ColumnValue(
+    table.environment,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> accountId(String? value) => _i1.ColumnValue(
+    table.accountId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> kind(String? value) => _i1.ColumnValue(
+    table.kind,
+    value,
+  );
+
+  _i1.ColumnValue<_i3.BillingMethod, _i3.BillingMethod> method(
+    _i3.BillingMethod? value,
+  ) => _i1.ColumnValue(
+    table.method,
+    value,
+  );
+
+  _i1.ColumnValue<_i4.BillingFlow, _i4.BillingFlow> flow(
+    _i4.BillingFlow? value,
+  ) => _i1.ColumnValue(
+    table.flow,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> installmentCount(int? value) => _i1.ColumnValue(
+    table.installmentCount,
+    value,
+  );
+
+  _i1.ColumnValue<_i5.BillingCycle, _i5.BillingCycle> cycle(
+    _i5.BillingCycle? value,
+  ) => _i1.ColumnValue(
+    table.cycle,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> providerCustomerId(String? value) =>
+      _i1.ColumnValue(
+        table.providerCustomerId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> externalReference(String? value) =>
+      _i1.ColumnValue(
+        table.externalReference,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> providerGroupId(String? value) =>
+      _i1.ColumnValue(
+        table.providerGroupId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> creationState(String? value) =>
+      _i1.ColumnValue(
+        table.creationState,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> createAttempted(bool? value) => _i1.ColumnValue(
+    table.createAttempted,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> subscriptionStatus(String? value) =>
+      _i1.ColumnValue(
+        table.subscriptionStatus,
+        value,
+      );
 }
 
 class BillingChargeRecordTable extends _i1.Table<int?> {
@@ -311,6 +553,61 @@ class BillingChargeRecordTable extends _i1.Table<int?> {
       'updatedAt',
       this,
     );
+    environment = _i1.ColumnString(
+      'environment',
+      this,
+    );
+    accountId = _i1.ColumnString(
+      'accountId',
+      this,
+    );
+    kind = _i1.ColumnString(
+      'kind',
+      this,
+    );
+    method = _i1.ColumnEnum(
+      'method',
+      this,
+      _i1.EnumSerialization.byName,
+    );
+    flow = _i1.ColumnEnum(
+      'flow',
+      this,
+      _i1.EnumSerialization.byName,
+    );
+    installmentCount = _i1.ColumnInt(
+      'installmentCount',
+      this,
+    );
+    cycle = _i1.ColumnEnum(
+      'cycle',
+      this,
+      _i1.EnumSerialization.byName,
+    );
+    providerCustomerId = _i1.ColumnString(
+      'providerCustomerId',
+      this,
+    );
+    externalReference = _i1.ColumnString(
+      'externalReference',
+      this,
+    );
+    providerGroupId = _i1.ColumnString(
+      'providerGroupId',
+      this,
+    );
+    creationState = _i1.ColumnString(
+      'creationState',
+      this,
+    );
+    createAttempted = _i1.ColumnBool(
+      'createAttempted',
+      this,
+    );
+    subscriptionStatus = _i1.ColumnString(
+      'subscriptionStatus',
+      this,
+    );
   }
 
   late final BillingChargeRecordUpdateTable updateTable;
@@ -333,6 +630,32 @@ class BillingChargeRecordTable extends _i1.Table<int?> {
 
   late final _i1.ColumnDateTime updatedAt;
 
+  late final _i1.ColumnString environment;
+
+  late final _i1.ColumnString accountId;
+
+  late final _i1.ColumnString kind;
+
+  late final _i1.ColumnEnum<_i3.BillingMethod> method;
+
+  late final _i1.ColumnEnum<_i4.BillingFlow> flow;
+
+  late final _i1.ColumnInt installmentCount;
+
+  late final _i1.ColumnEnum<_i5.BillingCycle> cycle;
+
+  late final _i1.ColumnString providerCustomerId;
+
+  late final _i1.ColumnString externalReference;
+
+  late final _i1.ColumnString providerGroupId;
+
+  late final _i1.ColumnString creationState;
+
+  late final _i1.ColumnBool createAttempted;
+
+  late final _i1.ColumnString subscriptionStatus;
+
   @override
   List<_i1.Column> get columns => [
     id,
@@ -345,6 +668,19 @@ class BillingChargeRecordTable extends _i1.Table<int?> {
     status,
     createdAt,
     updatedAt,
+    environment,
+    accountId,
+    kind,
+    method,
+    flow,
+    installmentCount,
+    cycle,
+    providerCustomerId,
+    externalReference,
+    providerGroupId,
+    creationState,
+    createAttempted,
+    subscriptionStatus,
   ];
 }
 

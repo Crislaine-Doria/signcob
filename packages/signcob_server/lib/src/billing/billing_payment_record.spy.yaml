@@ -1,0 +1,23 @@
+class: BillingPaymentRecord
+serverOnly: true
+table: billing_payment
+fields:
+  chargeId: int, relation(parent=billing_charge)
+  environment: String
+  accountId: String
+  providerId: String
+  amountCents: int
+  dueDate: String
+  installmentNumber: int?
+  status: BillingStatus
+  confirmedAt: DateTime?
+  receivedAt: DateTime?
+  invoiceUrl: String?
+  createdAt: DateTime
+  updatedAt: DateTime
+indexes:
+  billing_payment_provider_idx:
+    fields: environment, accountId, providerId
+    unique: true
+  billing_payment_charge_idx:
+    fields: chargeId

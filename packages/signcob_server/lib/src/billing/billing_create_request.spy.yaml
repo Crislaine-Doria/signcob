@@ -1,0 +1,12 @@
+class: BillingCreateRequest
+fields:
+  clientId: int
+  negotiationId: int?
+  kind: String
+  method: BillingMethod
+  flow: BillingFlow
+  amountCents: int
+  dueDate: String
+  idempotencyKey: String
+  installmentCount: int?
+  cycle: BillingCycle?

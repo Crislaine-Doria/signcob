@@ -1,0 +1,10 @@
+enum: BillingCycle
+serialized: byName
+values:
+  - weekly
+  - biweekly
+  - monthly
+  - bimonthly
+  - quarterly
+  - semiannually
+  - yearly

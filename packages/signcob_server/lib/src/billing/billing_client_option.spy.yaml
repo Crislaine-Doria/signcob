@@ -1,0 +1,5 @@
+class: BillingClientOption
+fields:
+  id: int
+  name: String
+  readyForBilling: bool

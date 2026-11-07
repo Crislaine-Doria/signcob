@@ -8,3 +8,14 @@ fields:
   status: BillingStatus
   createdAt: DateTime
   updatedAt: DateTime
+  idempotencyKey: String?
+  kind: String?
+  method: BillingMethod?
+  flow: BillingFlow?
+  installmentCount: int?
+  cycle: BillingCycle?
+  providerGroupId: String?
+  creationState: String?
+  subscriptionStatus: String?
+  payments: List<BillingPayment>?
+  clientName: String?

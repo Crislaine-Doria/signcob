@@ -1,0 +1,14 @@
+class: ChatParticipant
+table: chat_participant
+fields:
+  conversationId: int, relation(parent=chat_conversation)
+  authUserId: String
+  createdAt: DateTime
+  removedAt: DateTime?
+indexes:
+  chat_participant_conversation_user_unique:
+    fields: conversationId, authUserId
+    unique: true
+  chat_participant_user_active_idx:
+    fields: authUserId, removedAt, conversationId
+

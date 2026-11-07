@@ -1,0 +1,11 @@
+class: BillingPayment
+fields:
+  id: int
+  providerPaymentId: String
+  amountCents: int
+  dueDate: String
+  installmentNumber: int?
+  status: BillingStatus
+  confirmedAt: DateTime?
+  receivedAt: DateTime?
+  invoiceUrl: String?

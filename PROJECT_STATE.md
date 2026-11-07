@@ -746,3 +746,909 @@ ou priorizar com o responsável a jornada jurídica a migrar em seguida.
   desta nova entrega ainda não foram inspecionados; testes locais e revisão
   acima permanecem a evidência de aceite. Decisões Asaas seguem pendentes,
   criação real permanece bloqueada e nenhuma publicação do aplicativo ocorreu.
+
+## Verificação da integração contínua Asaas — 05/11/2026
+
+- Autoria desta verificação e do registro: sessão principal (`/root`), usando
+  os perfis 00, 27 e 08 como orientação; perfis não representam processos ativos.
+  Revisão independente: `/root/revisao_ci_asaas`, `accepted`, sem achados
+  acionáveis; conferiu Git e evidências remotas diretamente, somente leitura.
+- Git local: `main`, HEAD e referência local `origin/main` em
+  `0f8592277842cdd862a636d57b3c759e84412268`, sem alterações rastreadas antes
+  deste registro e com 40 arquivos não rastreados preservados. A branch
+  `codex/asaas-original-df3096c` continua em
+  `df3096cd61dd51fba4a17798f1747a7702ef12ba`. Framework confirmado em
+  `24124bbf2832b83996eb1fe716dac02e5d508585`; não foi adicionado ao índice.
+- Ponta remota confirmada pela API de branches do conector GitHub no mesmo
+  SHA completo acima. `git ls-remote` falhou com `getaddrinfo() thread failed
+  to start`; não foi necessário alterar configurações globais ou credenciais.
+  A API de status legado retornou lista vazia; o aceite abaixo vem das
+  execuções Actions filtradas por `head_sha`, dos jobs e de seus logs, não
+  dessa lista vazia nem do wrapper limitado a eventos de pull request.
+- As três execuções são do evento `push`, branch `main`, tentativa 1, SHA
+  `0f8592277842cdd862a636d57b3c759e84412268`. Todas terminaram em
+  `completed/success` (`passed`). Horários abaixo em São Paulo (UTC−3).
+
+| Workflow | Execução | Job | Atualização final em 05/11/2026 (`updated_at`) | Evidência |
+|---|---|---|---|---|
+| Tests | [42051998792](https://github.com/Crislaine-Doria/signcob/actions/runs/42051998792) | [127330233254](https://github.com/Crislaine-Doria/signcob/actions/runs/42051998792/job/127330233254) | 12:11:22 | `dart test`: 34 testes aprovados; `serverpod generate` e `Stop containers` aprovados. |
+| Format | [42051998914](https://github.com/Crislaine-Doria/signcob/actions/runs/42051998914) | [127330233149](https://github.com/Crislaine-Doria/signcob/actions/runs/42051998914/job/127330233149) | 12:09:22 | Dart 3.8.0; `dart format --set-exit-if-changed .`: 57 arquivos, zero alterações. |
+| Analyze | [42051998764](https://github.com/Crislaine-Doria/signcob/actions/runs/42051998764) | [127330233223](https://github.com/Crislaine-Doria/signcob/actions/runs/42051998764/job/127330233223) | 12:09:31 | Dart 3.8.0; `dart analyze --fatal-infos`: nenhum diagnóstico. |
+
+- Tests executou no Ubuntu 24.04 com Flutter 3.32.8 configurado e Serverpod
+  CLI 3.2.3 ativado no log. A senha de teste foi efêmera e mascarada. O log
+  confirma remoção do contêiner PostgreSQL, volume e rede após os 34 testes.
+  Os testes Asaas usam transporte/fornecedor controlados; não comprovam uma
+  chamada real ao sandbox. Format e Analyze verificam o servidor; estes três
+  workflows não representam aceite de navegador, build Flutter ou publicação.
+- Os jobs emitiram aviso de depreciação do runtime Node 20 de
+  `actions/checkout@v4`, executado pelo runner com Node 24. Não houve falha;
+  atualização preventiva fica como manutenção futura, fora da correção mínima.
+- Nenhuma correção, contrato ou migration foi necessária. Não houve reexecução
+  local das suítes, commit ou push nesta etapa. Somente este estado foi editado;
+  os documentos/scripts não rastreados, IDE/caches e arquivos privados não
+  foram incluídos em commit. Nenhuma publicação, cobrança, credencial do legado
+  ou worker externo foi utilizada.
+
+### Decisões para o próximo incremento sandbox — ainda indefinidas
+
+| Decisão do responsável | Alternativas a esclarecer antes de implementar |
+|---|---|
+| Modalidades e fluxo | Pix, boleto e/ou cartão; cobrança única, parcelada e/ou recorrente; indicar o que vale para dívidas e para honorários/serviços. Nenhuma modalidade está escolhida. |
+| Vínculo de clientes | Definir quem é o pagador em cada fluxo (o cliente SignCob ou terceiro/devedor), se o operador vincula um `cus_...` existente ou se haverá cadastro controlado no sandbox, e se a relação será um para um. Persistir o vínculo por ambiente/conta e conferir duplicidades são propostas técnicas para revisão, sem criação automática nesta etapa. |
+| Confirmação de pagamento | Definir se a baixa ocorre no sinal `PAYMENT_CONFIRMED`, em `PAYMENT_RECEIVED`, ou se o produto terá estados distintos para confirmação e disponibilidade. Prever também tratamento de estorno/contestação; nenhum desses eventos altera o estado atual. |
+
+- Referências oficiais consultadas em 05/11/2026:
+  [criar cobrança](https://docs.asaas.com/reference/create-new-payment),
+  [cadastrar cliente](https://docs.asaas.com/reference/create-new-customer) e
+  [eventos de pagamento](https://docs.asaas.com/docs/payment-events).
+  Asaas distingue `PAYMENT_CONFIRMED` (pagamento sinalizado, saldo ainda
+  indisponível) de `PAYMENT_RECEIVED` (valor disponível). O cadastro de cliente
+  permite duplicidades; `externalReference` não deve ser presumido como chave
+  única. Essas informações descrevem o fornecedor, não decidem a regra SignCob.
+- Próximo passo: obter as três definições, especificar exemplos e critérios de
+  aceite e então preparar um incremento sandbox revisado. A conciliação das
+  reservas de resultado incerto continua pendente. `ensureCreationAvailable`
+  permanece bloqueando criação no adaptador Asaas, e o aceite de negociação
+  continua sem criar cobrança ou confirmar pagamento.
+
+### Parecer independente e revisão breve de processo
+
+- `/root/revisao_ci_asaas` aceitou o acréscimo documental de 64 linhas antes
+  deste fechamento (SHA-256 do arquivo então revisado:
+  `DB8A27C347E3AACD30F92FAEB6760800044725D1EB1BE6DDFFDFA9E57C3F68C2`).
+  Confirmou separadamente SHA remoto/local, runs/jobs/logs, 34 testes, formatação,
+  análise, preservação da branch e bloqueio de criação. Não reexecutou testes
+  nem validou sandbox real ou navegador. Após o parecer, somente este fechamento
+  e a precisão do cabeçalho de horário (`updated_at`) foram registrados.
+- Revisão breve pelo mesmo subagente, orientado pelos perfis 09/54: fricção
+  observada no status legado vazio e no wrapper restrito a pull requests;
+  consultar Actions por SHA e conferir jobs/logs comprovou os resultados dos
+  eventos push. Nenhum acompanhamento adicional de processo; permanecem as
+  três decisões de negócio e a manutenção preventiva de Node 20.
+
+## Definições do sandbox Asaas — 05/11/2026
+
+- O responsável respondeu às decisões apresentadas após a CI: **todos** os
+  meios (Pix, boleto e cartão) e fluxos (única, parcelada e recorrente), para
+  dívidas e honorários/serviços; **cliente SignCob como pagador**; **estados
+  separados** para confirmação do pagamento e recebimento do valor.
+- Esclarecimento adicional explícito: **o SignCob cria ou reutiliza o cadastro
+  Asaas**. A dúvida entre cadastro pelo sistema e vínculo manual está resolvida.
+  As pendências de decisão registradas na seção anterior são históricas e
+  ficam substituídas por estas definições. A disponibilidade de combinações
+  entre meio/periodicidade deve ser conferida no fornecedor, sem presumir suporte.
+- O próximo incremento deve representar confirmação (`PAYMENT_CONFIRMED`,
+  saldo indisponível) e recebimento (`PAYMENT_RECEIVED`, valor disponível)
+  separadamente. Essa definição não autoriza produção ou cobrança real.
+- Autoria real do registro e dos critérios: sessão principal (`/root`), com
+  orientação dos perfis 08/11. Critérios ASAAS-01 a ASAAS-06 em
+  `docs/development/cobrancas-asaas.md`: `planned`. São requisitos para vínculo,
+  modalidades, estados, idempotência/concorrência, conciliação e validação, não
+  resultados de testes. Revisão independente por `/root/revisao_ci_asaas`:
+  `accepted`, sem achados acionáveis, somente leitura dos dois documentos;
+  conferiu fidelidade às respostas, critérios planejados e bloqueio mantido.
+- Implementação ainda pendente: contratos/modelos de meios e periodicidades,
+  cadastro/reutilização segura por ambiente/conta, parcelas/recorrências,
+  estados separados, conciliação e tratamento de eventos. Nenhum código gerado,
+  migration, credencial ou configuração foi alterado nesta definição. O bloqueio
+  `ensureCreationAvailable` continua ativo até implementação, testes e revisão.
+- Preservados o registro local anterior da CI e os arquivos não rastreados;
+  sem commit/push, chamada ao Asaas, publicação ou concessão de permissões.
+- Revisão breve 54 pelo mesmo subagente: separar identidade do pagador da
+  responsabilidade pelo cadastro evitou deixar a segunda decisão incompleta;
+  esclarecimento do responsável resolveu a lacuna. Acompanhamento: desenho
+  técnico e testes já previstos, sem nova mudança de processo. Nenhum teste
+  foi executado nesta etapa documental. `git diff --check` aprovado.
+
+## Continuação funcional do sandbox Asaas — 05/11/2026
+
+- Pedido integral recebido por anexo; autorizadas as etapas 1–8, exclusivamente
+  sandbox/dados sintéticos, sem push, publicação, produção ou workers externos.
+  Decisões de meios, fluxos, pagador e estados anteriores permanecem válidas.
+- Inspeção inicial: HEAD/local e ponta `main` confirmada pela API GitHub em
+  `0f8592277842cdd862a636d57b3c759e84412268`. `git ls-remote` falhou por
+  resolução de rede; usado o conector em leitura. Branch de trabalho local
+  `codex/asaas-sandbox-20261105` criada, sem alterar a main. Framework permanece
+  na revisão fixada; não incluído no índice.
+- Preservação: dois documentos já modificados e 40 arquivos não rastreados
+  identificados; hashes iniciais em `build/asaas-sandbox-preexistentes-20261105.json`
+  (artefato local ignorado). Documentos existentes serão ampliados preservando
+  o conteúdo anterior; auxiliares não integram automaticamente a candidata.
+- Processos reais: `/root` orquestra/integra/registra (perfis 00/40/08/26);
+  `/root/asaas_backend` é autor de contratos, integração, dados e testes servidor;
+  `/root/asaas_flutter` é autor da interface e testes Flutter;
+  `/root/asaas_revisao` revisa independentemente (09/18/54). Sem worker externo.
+
+| Etapa | Arquivos/responsável | Dependência e aceite | Estado |
+|---|---|---|---|
+| 1 Contratos | `docs/development/asaas-sandbox-contratos.md`, backend | Matriz API oficial, invariantes, estados e testes; revisão separada | planned |
+| 2 Clientes | billing servidor/YAML/testes, backend | Contrato revisto; identidade, conta/ambiente, concorrência e incerteza verificadas | planned |
+| 3 Única | billing servidor/testes, backend | Cliente conciliado; meios, validação e chave estável | planned |
+| 4 Parcelas | billing servidor/YAML/testes, backend | IDs de grupo e parcelas, acompanhamento individual | planned |
+| 5 Recorrência | billing servidor/YAML/testes, backend | Assinatura e pagamentos independentes, importação sem duplicação | planned |
+| 6 Conciliação | billing servidor/testes, backend | GET autenticado, incerteza sem reenvio, estados financeiros monotônicos | planned |
+| 7 Interface | Flutter lib/testes, Flutter | Contratos gerados estáveis; permissões, estados e responsividade | planned |
+| 8 Candidata | verificações/estado, raiz; parecer, revisor | Suítes, geração, migration, revisão e limitações explícitas | planned |
+
+- Cada marco passa por verificações proporcionais e revisão antes de liberar
+  dependentes. Dono único de geração e migrations: `asaas_backend`.
+- Ambiente: executáveis Dart diretos respondem (3.13.3 local e 3.8.0 do CI).
+  Análise inicial com Dart 3.8.0: `passed`, nenhum diagnóstico. SDK local novo:
+  17 avisos experimentais preexistentes (incluindo auxiliares não rastreados),
+  sem erro; não confundir com regressão do incremento. Wrappers `.bat` travam;
+  usar executáveis diretos. Docker 29.2.1 disponível com execução autorizada,
+  imagem pgvector/pgvector:pg16 já local. Validação usará cópia/banco descartáveis.
+- Nenhuma chamada Asaas foi executada. Autoria e revisão consultam a API
+  oficial; restrições de WooCommerce não definem o contrato da API SignCob.
+
+### Etapa 1 — contrato revisado
+
+- Autoria real: `/root/asaas_backend`; revisão independente
+  `/root/asaas_revisao`: `accepted` no SHA-256
+  `5B23200C91B4344AA7C16CF050074E249DA5CD2AD08338D05EF7D1965908D94B`
+  de `docs/development/asaas-sandbox-contratos.md`. Etapa 1: `passed` como
+  desenho, sem considerar implementação/testes ainda não realizados.
+- Desenho inclui DTOs, reservas duráveis, índices por conta/ambiente/documento,
+  consultas mínimas para financeiro, parcelas e assinaturas com pagamentos
+  individuais e confirmação/recebimento separados. Sem webhook neste incremento;
+  conciliação explícita faz GET autenticado. Nenhum POST é refeito por incerteza.
+- A API específica foi conferida pelo autor e revisor: Pix/boleto/cartão estão
+  previstos em única/parcelada/assinatura; Pix recorrente convencional não é
+  Pix Automático. Cartão usa fatura hospedada e não captura PAN/CVV; geração de
+  faturas não promete ativação automática da recorrência pela primeira fatura.
+  Jornada real ainda depende de credencial/configuração sandbox (`not_verified`).
+- Revisão corrigiu antes da implementação: disputa de documento entre dois
+  clientes SignCob; distinção entre incerteza no cadastro e na cobrança;
+  limites explícitos da jornada de cartão. Processo 54 pelo mesmo revisor:
+  consultar API específica evitou aplicar restrições do WooCommerce; acompanhar
+  payloads e associação nos testes das próximas etapas.
+- Liberada etapa 2 ao autor backend; Flutter pode iniciar apresentação/testes
+  conforme contrato aceito, compilação integrada após geração estável. Geração
+  e migrations continuam com autor único. A cópia de validação resolveu
+  dependências offline com Dart 3.8.0, sem alterar lockfiles do workspace.
+- Regressão inicial executada pela raiz antes da implementação: `passed`,
+  **34/34 testes servidor** com Dart 3.8.0 na cópia
+  `build/asaas-sandbox-qa-20261105`, PostgreSQL/pgvector descartável em tmpfs e
+  porta aleatória apenas local. Cadeia de migrations aplicada; contêiner
+  removido pelo finally e ausência conferida. Log local ignorado:
+  `build/asaas-sandbox-baseline-tests-20261105.log`. Não comprova sandbox real.
+
+### Etapa 2 — cliente Asaas, revisão em andamento
+
+- Autor `/root/asaas_backend` gerou os novos DTOs e a migration aditiva
+  `20261105154406797` usando Serverpod CLI 3.2.3, sem edição manual de gerados.
+  Adiciona vínculo de cliente, pagamentos individuais e colunas opcionais da
+  intenção; preserva registros anteriores. Código de clientes usa bloqueios,
+  índices únicos e marcador durável de tentativa antes do POST.
+- Verificação inicial pela raiz na cópia Dart 3.8.0: 16 testes focados aprovados,
+  análise limpa, 71 arquivos formatados sem alterações. Depois da primeira
+  correção de concorrência: 17 testes focados aprovados, incluindo conciliação
+  que vence antes da marca de envio. Logs locais `build/asaas-sandbox-etapa2-*.log`.
+  Ambos os bancos temporários foram removidos; testes não chamam Asaas real.
+- Revisão independente identificou também a ordem inversa: uma consulta inicia
+  antes da marca de POST e termina depois dela. O vínculo deve revalidar a
+  referência dentro do bloqueio usando o estado atual, não o snapshot anterior.
+  Correção e teste exigidos antes de aceitar etapa 2. As aprovações de testes
+  acima são das versões anteriores; não aprovam antecipadamente essa correção.
+- Configuração privada conferida somente por presença: `.env` está em sandbox,
+  `ASAAS_API_KEY` e `ASAAS_ACCOUNT_ID` não preenchidos. Nenhum valor privado foi
+  exibido ou alterado. Chamadas reais permanecem `not_verified`.
+
+### Etapa 2 — aceite após correções
+
+- `/root/asaas_revisao`: `accepted`, nenhum achado aberto. A corrida inversa
+  P1 foi corrigida por releitura de `createAttempted` e validação da referência
+  dentro do bloqueio; teste com duas barreiras cobre a ordem identificada.
+  Hashes revistos e iguais na cópia de execução: serviço
+  `9DFC59BB218FB9958176C0084C2588D96E511888A059588D9727BA48F7DF01F9`, teste
+  `761F0333C80FEF770F5ED2CC2AD260D471DAAAD6E1B1C9BF1A61BC166029EF80`.
+- Verificação final pela raiz: **18/18 aprovados** (8 integração SQL de clientes,
+  3 adaptador cliente e 7 regressão de cobrança), análise Dart 3.8.0 limpa,
+  formatação de 71 arquivos sem alterações. Log
+  `build/asaas-sandbox-etapa2-revisada-tests-20261105.log`. Migration aplicada em
+  banco novo e remoção conferida pelo runner. Revisor inspecionou código/logs;
+  não reexecutou suíte nem confirmou Docker diretamente (pipe negado na leitura).
+- Etapa 2: `passed` nos testes controlados. Cadastro remoto efetivo e vínculo
+  em conta sandbox real: `not_verified`. Não há produção ou credenciais novas.
+- Processo 54 pelo revisor: testar ambas as ordens da corrida do marcador
+  durável; aplicar rigor equivalente às reservas e conciliação de cobranças.
+  Etapa 3 liberada ao autor backend. UI tem 18 cenários controlados iniciais
+  aprovados pelo autor Flutter; ainda aguarda integração e revisão da etapa 7.
+
+### Etapa 3 — cobrança única aceita
+
+- Autoria real `/root/asaas_etapa3_backend` (03/15/21/22): cobrança única
+  `PIX`, `BOLETO` e `CREDIT_CARD` por `POST /v3/payments`, com payload mínimo,
+  cartão somente por fatura hospedada e sem PAN/CVV, juros, multa ou desconto.
+- A reserva idempotente agora registra `createAttempted` sob bloqueio antes do
+  POST. Repetições e concorrência mantêm uma única reserva e um único dono da
+  tentativa; após resultado incerto não há reenvio. `refresh` usa somente GET/
+  listagem e confere conta, cliente, referência, meio, valor e vencimento.
+- Migration aditiva `20261105211247382-asaas-single-attempt` gerada pela CLI
+  Serverpod; artefatos gerados não foram editados manualmente. Hashes centrais
+  conferidos pela raiz e pelo revisor.
+- Evidência do autor: **6/6 testes unitários** e **3/3 testes de integração**
+  aprovados em PostgreSQL/pgvector descartável, migration aplicada em banco
+  novo, contêiner removido, formatação focal e `git diff --check` aprovados.
+  Análise focal sem erros; um aviso experimental e quatro infos não bloqueantes.
+- Revisão independente `/root/asaas_etapa3_revisao` (09/18/54): `accepted`,
+  sem achados técnicos ou de segurança abertos. O revisor não reexecutou os
+  testes porque a resolução tentou acessar pub.dev sem rede; inspecionou código,
+  migration, hashes e evidências do autor. Processo 54 recomenda preservar um
+  runner offline reproduzível ou documentar o shim do pré-check Flutter.
+- ASAAS-01 e ASAAS-03 para cobrança única: `passed` em testes controlados.
+  Emissão e conciliação em conta Asaas sandbox real: `not_verified`; nenhuma
+  chamada externa, credencial, produção, push, commit ou publicação ocorreu.
+  Etapa 4 liberada para autoria backend.
+
+### Etapa 4 — parcelamento aceito após correção P1
+
+- Autoria `/root/asaas_etapa3_backend`: `BillingFlow.installment` para Pix,
+  boleto e cartão usa `POST /v3/payments` com `installmentCount + totalValue`,
+  sem `value`, `installmentValue`, juros, multa ou desconto. A primeira resposta
+  identifica o grupo; as parcelas são lidas por
+  `GET /v3/installments/{id}/payments` e persistidas individualmente.
+- Validações controladas cobrem conta, cliente, referência, meio, grupo, limites
+  2–60 (cartão até 12), quantidade, números únicos, primeiro vencimento, soma
+  total e arredondamento na última parcela. Conciliação encontra um grupo único
+  sem novo POST; concorrência mantém uma reserva e uma tentativa.
+- Evidência inicial do autor: **7/7 unitários** e **7/7 integrações** das etapas
+  3–4 aprovados em PostgreSQL/pgvector descartável; formatação e
+  `git diff --check` aprovados. Nenhum schema adicional ou migration foi preciso.
+- Revisão independente `/root/asaas_etapa3_revisao` solicitou mudança P1: o
+  upsert por `providerId` não conferia a estabilidade de `installmentNumber`,
+  permitindo aplicar estado à parcela errada se o fornecedor trocasse números.
+- Autor corrigiu `_observe` e adicionou regressão que troca 1↔2, exige
+  `provider_response` e comprova rollback sem alterar números/estados. **5/5
+  testes focados** passaram; hashes finais do serviço e teste conferidos.
+- Parecer final independente: `accepted`, sem achados abertos; inspeção estática,
+  hashes e diff conferidos, sem reexecução independente da integração. Processo
+  54: incluir estabilidade ID↔posição no checklist de coleções da recorrência.
+- Etapa 4: `passed` em testes controlados. Parcelamento em sandbox Asaas real:
+  `not_verified`. Nenhuma chamada externa, migration nova, credencial, commit,
+  push ou publicação. Etapa 5 liberada.
+
+### Etapa 5 — recorrência aceita após correção P1
+
+- Autoria `/root/asaas_etapa3_backend`: `BillingFlow.recurring` para Pix,
+  boleto e cartão cria `POST /v3/subscriptions` com cliente, meio, valor por
+  ciclo, primeira data, ciclo, referência e descrição. Não envia PAN/CVV/token,
+  juros, multa, desconto, término ou quantidade máxima; não promete ativação ou
+  débito automático do cartão nem confunde Pix convencional com Pix Automático.
+- Assinatura usa `providerGroupId` e `subscriptionStatus` próprios; pagamentos
+  já gerados são importados incrementalmente por
+  `GET /v3/subscriptions/{id}/payments`, com estados financeiros individuais.
+  Resultado incerto concilia por identidade e parâmetros exatos, sem novo POST.
+- Evidência inicial: **8/8 unitários**, **8/8 integrações** das etapas 3–4 e,
+  após corrigir colisão sintética de fixture, **3/3 recorrentes** aprovados.
+  Análise focal sem erros; formatação e `git diff --check` aprovados. Nenhuma
+  migration ou geração nova necessária.
+- Revisão independente `/root/asaas_etapa3_revisao` pediu mudança P1: o refresh
+  congelava `nextDueDate` na primeira data, embora esse campo avance conforme a
+  assinatura gera novas cobranças, impedindo importações futuras.
+- Autor separou a correlação inicial (data original obrigatória na criação e
+  conciliação incerta) do cursor evolutivo de assinatura já vinculada. Teste
+  avança `nextDueDate`, importa nova cobrança sem POST e preserva a data original
+  da intenção; **4/4 testes recorrentes** passaram, análise e diff limpos.
+- Parecer final: `accepted`, hashes e correção inspecionados, sem reexecução
+  independente. Processo 54: distinguir invariantes imutáveis de cursores do
+  fornecedor no checklist de integrações.
+- Etapa 5: `passed` em testes controlados; recorrência real no sandbox e jornada
+  real de cartão: `not_verified`. Nenhuma chamada externa, credencial, commit,
+  push ou publicação. Etapa 6 liberada.
+
+### Etapa 6 — estados e conciliação aceitos com validação local limitada
+
+- Autoria real `/root/agente57` (modo econômico): nenhuma mudança de produção
+  foi necessária; foi adicionada cobertura sintética em
+  `billing_installment_endpoint_test.dart` para `PAYMENT_RECEIVED` direto sem
+  fabricar confirmação, `CONFIRMED → RECEIVED`, observação atrasada sem
+  regressão e ausência de duplicatas no upsert.
+- Inspeção confirmou que a lógica existente mantém `confirmedAt` e `receivedAt`
+  separados e monotônicos, preserva recebimento contra observação atrasada,
+  mantém status desconhecido em `attention`, não repete POST após criação
+  incerta, confere conta/ambiente/cliente/referência/grupo/assinatura e exige
+  permissões atuais de leitura/escrita. Não há webhook, polling ou worker.
+- Revisão independente `/root/agente57_revisao`: `accepted`, sem regressão
+  evidente. Lacunas registradas: o novo teste não cobre revogação, divergência
+  de conta/cliente ou negociação incompatível, não verifica timestamps da
+  terceira parcela após observação atrasada e não afirma diretamente unicidade
+  por cada `providerId`; permanecem pontos para a validação final, não falhas
+  abertas da lógica inspecionada.
+- `git diff --check` e formatação focal passaram. Teste de integração e análise
+  Dart ficaram `not_verified`: o runtime local travou por mais de 90 segundos,
+  inclusive em `dart --version`, e as execuções foram interrompidas. Nenhuma
+  chamada Asaas real, credencial, commit, push ou publicação ocorreu.
+- Etapa 6: `passed` por inspeção e cobertura adicionada, com execução dinâmica
+  `not_verified`. A etapa 7 (interface interna) permanece pendente.
+
+### Etapa 7 — interface interna aceita por inspeção
+
+- Autoria `/root/agente57` (modo econômico): a tela Asaas já expunha os nove
+  pares de fluxo/meio — única, parcelada e recorrente × Pix, boleto e cartão —;
+  o teste focalizado foi ampliado para percorrer todas as combinações. Nenhuma
+  mudança de produção foi necessária.
+- A interface diferencia aguardando conciliação, aguardando pagamento,
+  confirmado com saldo indisponível e recebido com saldo disponível. Informa que
+  criação não confirma pagamento, mantém ação explícita de conciliação após
+  timeout e identifica sandbox/dados sintéticos. Permissões de leitura/escrita
+  continuam sob autoridade do servidor; acesso negado, revogação e modo somente
+  leitura têm cobertura declarada.
+- Revisão independente `/root/agente57_revisao`: `accepted`, sem regressão
+  evidente. Lacuna: não executou a suíte, apenas confirmou a cobertura pelo
+  código; a execução do teste Flutter também ficou `not_verified` por travamento
+  do runtime local após 30 segundos. Formatação/checagem de espaços passaram.
+- Hashes conferidos: tela sem alteração e teste focalizado ampliado. Nenhuma
+  chamada Asaas real, credencial, publicação, commit ou push ocorreu.
+- Etapa 7: `passed` por inspeção e cobertura declarada; execução Flutter
+  dinâmica `not_verified`. Etapa 8 permanece pendente para consolidação final,
+  verificação proporcional e registro explícito das limitações.
+
+### Etapa 8 — consolidação Asaas sandbox
+
+- `/root/agente57` atualizou `docs/development/cobrancas-asaas.md` e o cabeçalho
+  de `docs/development/asaas-sandbox-contratos.md` para refletir que as etapas
+  foram implementadas/revisadas, mantendo explícitos os limites: testes usam
+  transporte sintético e a disponibilidade, emissão e liquidação reais do
+  sandbox não foram verificadas.
+- Critérios ASAAS-01 a ASAAS-06 agora estão documentados como implementados,
+  com cobertura sintética e ressalvas individuais. `git diff --check` documental
+  passou; nenhum segredo, endpoint de produção, worker, webhook ou cobrança real
+  foi habilitado.
+- Parecer independente econômico `/root/agente57_revisao`: `accepted` para a
+  interface e para a cobertura de estados, sem regressões evidentes. Lacunas
+  permanecem registradas: suíte final Dart/Flutter não executada por travamento
+  do runtime; validação real do Asaas, permissões em ambiente final e liquidação
+  continuam `not_verified`.
+- Estado da candidata: etapas 1–7 concluídas em código/documentação e revisadas;
+  etapa 8 consolidada com limitações explícitas. Não houve commit, push,
+  publicação, chamada externa ou uso de credenciais.
+
+## Chat e agenda com Google Agenda — preparação interrompida — 07/11/2026
+
+- O escopo do MVP foi definido pelo responsável: chat interno e agenda integrada
+  ao Google Calendar, com OAuth exclusivamente no servidor, sincronização sem
+  workers externos, idempotência e isolamento por perfil/cliente.
+- A tentativa inicial de autoria criou contratos/endpoints temporários, mas foi
+  removida antes da integração porque o `serverpod_cli` não está disponível no
+  ambiente local e `dart run serverpod_cli generate` ficou bloqueado durante a
+  resolução. Nenhum código intermediário ou migration não gerada foi mantido.
+- Retomada necessária: disponibilizar o CLI Serverpod 3.2.3 offline ou permitir
+  a resolução das dependências; depois gerar contratos/migrations oficialmente,
+  implementar OAuth/transport Google com credenciais somente no servidor e
+  executar revisão, testes e build conforme o prompt do MVP.
+
+## Chat e agenda — ambiente e geração desbloqueados — 07/11/2026
+
+- Execução real: sessão principal `/root` preparou, gerou, integrou evidências e
+  atualizou este estado; `/root/diagnostico_devex` fez diagnóstico independente
+  somente leitura como especialista 26. Nenhum perfil foi contado como processo.
+- Ambiente confirmado: Windows x64; Dart 3.13.3 stable no Flutter local; Flutter
+  3.47.3 stable; SDK de validação Dart 3.8.0 preservado em
+  `build/workflow-sdk-3.8.0`; Serverpod, cliente, autenticação e testes em 3.2.3.
+  Nenhuma versão de projeto, manifesto ou lockfile foi alterada.
+- `serverpod_cli` 3.2.3 está disponível offline no cache local e ativado
+  globalmente. O snapshot respondeu `Serverpod version: 3.2.3`. O wrapper
+  `flutter.bat` local trava/precisa escrever no lock do SDK; shims ignorados em
+  `build/serverpod-shims` chamam os executáveis diretos e tornam o pre-check do
+  CLI reproduzível. A execução requer acesso ao cache instalado em
+  `C:/src/flutter`.
+- `dart run serverpod_cli generate` literal não é resolvido pelo projeto porque
+  `serverpod_cli` não consta em `dev_dependencies`. A simulação offline de
+  inclusão não concluiu e foi interrompida; nenhuma resolução ou lockfile foi
+  aceita. Também foi rejeitada a tentativa de apontar o package config global
+  diretamente (`Could not find package serverpod_cli`). Decisão: preservar os
+  manifests e usar a ativação global oficial já presente, como faz a CI.
+- Geração oficial executada em `packages/signcob_server` pelo snapshot local
+  do CLI 3.2.3 com `generate`: `passed`, 29,4 s, `Done`. O fluxo é equivalente
+  ao comando versionado da CI (`serverpod generate`) e não usou rede para
+  dependências. Antes e depois, SHA-256 de 62 arquivos em
+  `lib/src/generated`, `signcob_client/lib/src/protocol`, manifests e lockfiles:
+  zero diferenças. Os contratos de servidor e cliente já estavam compatíveis;
+  nenhuma alteração Asaas ou outro trabalho preexistente foi sobrescrita.
+- Verificações: servidor `dart analyze --fatal-infos` com Dart 3.8.0: `passed`,
+  sem diagnósticos; cliente `dart analyze` com Dart 3.13.3: `passed`; Flutter
+  `analyze`: `passed`, sem diagnósticos; Flutter `test --reporter expanded`:
+  `passed`, 103 testes e 7 ignorados; servidor unitário via resolução local:
+  `passed`, 15 testes. As execuções não usaram Google, Asaas real, publicação,
+  push, migration nova ou worker externo.
+- Falhas diagnosticadas antes do teste servidor aprovado: o comando comum
+  tentou consultar `pub.dev`; a execução Dart 3.8.0 encontrou transitivas do
+  analyzer que exigem linguagem 3.9; a primeira execução Dart 3.13.3 não pôde
+  usar a pasta temporária restrita. A execução final usou o package config já
+  resolvido, Dart 3.13.3 e acesso local à pasta temporária, sem alterar locks.
+- Aceite desta preparação: `passed`. O CLI compatível está disponível, a geração
+  oficial concluiu, cliente/servidor permaneceram idênticos e compatíveis, e as
+  análises/testes mínimos passaram. Limitação reproduzível: usar `serverpod
+  generate`/snapshot global 3.2.3; tornar o comando literal `dart run
+  serverpod_cli generate` exigiria decisão futura para adicionar a dependência
+  de desenvolvimento e resolver/registrar o lockfile.
+- Próximo passo autorizado após este aceite: primeira fatia vertical do chat,
+  com contratos Serverpod, migration gerada, endpoint protegido, listagem de
+  conversas, envio de mensagem e testes de autorização/isolamento entre
+  clientes. Agenda, Google OAuth e credenciais continuam fora dessa fatia.
+- Revisão independente `/root/revisao_preparacao` (09): `accepted`, sem achados
+  acionáveis. Conferiu CLI/cache, versões fixadas, zero diff em manifests e
+  lockfiles, fluxo equivalente da CI, artefatos regenerados, shims ignorados e
+  `git diff --check`. Não reexecutou geração ou suítes; validou as evidências da
+  sessão principal e manteve explícita a limitação do comando literal.
+- Revisão breve 54 pelo mesmo revisor: o baseline SHA-256 protegeu corretamente
+  o worktree com alterações preexistentes; manter a CLI global alinhada à CI
+  evitou mudança desnecessária de dependências. Preservar esse padrão até decisão
+  explícita para versionar `serverpod_cli` como dependência de desenvolvimento.
+
+### Etapa 9 — primeira fatia vertical do chat — 07/11/2026
+
+- Autoria real independente: `/root/chat_backend` (contratos, persistência,
+  endpoint e testes de autorização) e `/root/chat_flutter` (tela, adapters e
+  testes Flutter). Integração, documentação e validação final: `/root`.
+  Revisão independente: `/root/chat_revisao_final`, parecer **accepted**, sem
+  achados P0/P1/P2. A revisão 54 recomendou iniciar/verificar o banco de teste
+  antes de despachar a revisão independente.
+- Modelo Serverpod aditivo: `ChatConversation`, `ChatParticipant` e
+  `ChatMessage`, com índices de ordenação/paginação, unicidade de participante,
+  remoção lógica e FKs. A migration oficial
+  `20261107133745758-chat-first-slice` foi gerada com Serverpod CLI 3.2.3 usando
+  `serverpod create-migration --tag chat-first-slice`; seu `migration.sql` contém
+  somente as três tabelas do chat, índices e FKs. Gerados foram produzidos por
+  `serverpod generate`, sem edição manual.
+- Capacidades registradas em `access_admin_endpoint.dart`: `chat.partner`,
+  `chat.lawyer`, `chat.support` e `chat.client`. O perfil sócio recebe a
+  capacidade global já registrada. O servidor cruza escopos do token com o
+  `AuthUser` atual, rejeita conta bloqueada/revogada, combina capacidades e
+  aplica os vínculos atuais: sócio global; advogado por cliente atribuído;
+  atendimento por participante ativo; cliente por participante ativo e titular
+  do cliente. Financeiro e anônimo permanecem negados por padrão.
+- Endpoints protegidos: `chat.listConversations`, `chat.listMessages` e
+  `chat.sendMessage`. Paginação é executada no PostgreSQL, limite máximo 50,
+  ordem determinística por data/ID, mensagem trim de 1–4.000 caracteres, autor
+  e timestamp UTC definidos no servidor, e erros de recurso alheio/inexistente
+  não revelam existência. Remoção de participante, revogação e reatribuição
+  passam a valer sem depender de token novo.
+- Flutter integrado ao painel administrativo em
+  `packages/signcob_flutter/lib/main.dart` e
+  `admin_dashboard_screen.dart`. A tela cobre carregamento, vazio, falha/retry,
+  acesso negado, seleção, paginação, envio sem duplicação, 390 px/desktop e
+  texto ampliado. O marcador `_sessionGeneration` invalida respostas atrasadas
+  após troca de sessão, inclusive com o mesmo ID de conversa; nomes/identidade
+  nunca são enviados pelo app.
+- Evidências do backend: **6/6 testes focados** em
+  `test/integration/chat_endpoint_test.dart` e **9/9** na regressão de chat,
+  gestão de acessos e perfil parceiro; `dart analyze --fatal-infos` com exit 0
+  (22 avisos experimentais preexistentes, nenhum no chat); geração final com
+  `HASH_FILES_BEFORE=65`, `HASH_FILES_AFTER=65`, `HASH_CHANGED=0`.
+- Evidências do Flutter: teste focado pós-correção **8/8**; suíte completa
+  **111 testes aprovados e 7 ignorados**; `flutter analyze --no-pub` sem
+  diagnósticos; cliente gerado `dart analyze` sem diagnósticos; `git diff
+  --check` passou, com apenas avisos de conversão LF/CRLF do worktree.
+- Limitação da revisão independente: o teste servidor não foi reexecutado pelo
+  revisor porque o PostgreSQL de teste não estava ativo em `localhost:9090`.
+  Isso não invalida os 6/6 e 9/9 executados pelo autor, mas a próxima retomada
+  deve iniciar/verificar o banco antes da revisão. Nenhuma dependência foi
+  resolvida pela rede, nenhum segredo/Asaas foi usado, e todas as alterações
+  Asaas e demais mudanças locais preexistentes foram preservadas.
+- Documentação criada em `docs/development/chat.md`. Conversas e participantes
+  são previamente provisionados nesta fatia; não há endpoint de administração
+  deles. Agenda, Google OAuth, anexos, edição/exclusão, presença, tempo real,
+  notificações, workers, webhooks e filas continuam fora do escopo.
+- Próximo passo recomendado: subir o PostgreSQL de teste e repetir a suíte
+  independente do servidor; depois, implementar provisionamento administrativo
+  de conversas/participantes com os mesmos vínculos e capacidade atuais, antes
+  de iniciar agenda ou OAuth.
+
+## Validação final do sandbox Asaas — 07/11/2026
+
+- Autoria/executor real: `/root/agente57`; integração do estado e coordenação:
+  `/root`. O parecer independente desta validação permanece pendente. Nenhum
+  perfil foi contado como processo ativo.
+- Diagnóstico de runtimes, com limite explícito de 10 s: `dart.bat --version`
+  e `flutter.bat --version` expiraram e foram encerrados; os executáveis/snapshot
+  diretos responderam. `dart.exe --version` reportou Dart 3.13.3 em 0,16 s;
+  Flutter snapshot `--version` reportou Flutter 3.47.3/Dart 3.13.3 em 0,62 s.
+  O runner Dart 3.8.0 existe no cache local, mas o package config atual referencia
+  `analyzer 10.0.1` (linguagem 3.9); executar os testes com Dart 3.8.0 falha
+  por incompatibilidade do analyzer, sem alterar lockfiles.
+- Dependências: `dart test` tentou acessar pub.dev e terminou com socket error
+  (exit 65, 24,52 s); `dart pub get --offline` informou `test` ausente no cache
+  (exit 69). Os diretórios de pacotes referenciam um package config local já
+  resolvido. Para evitar rede, a validação usou o runner `test-1.29.0` local
+  diretamente, `--packages=.dart_tool/package_config.json` e compilador kernel
+  padrão ou `--compiler source`, conforme indicado em cada execução.
+- Suítes focadas Asaas: servidor unitário, 8/8 aprovados em 22,43 s; servidor
+  integração, 21/21 em 72,30 s; Flutter, 31/31 em 23,69 s usando o snapshot
+  Flutter direto com `test --no-pub`. A API e transporte dos testes são sintéticos.
+- Suíte completa Serverpod/Dart repetida com compilador kernel padrão: 56/56
+  testes passaram em 87,18 s. PostgreSQL 16/pgvector foi descartável, em tmpfs,
+  porta somente localhost e senha aleatória; as fixtures `withServerpod`
+  aplicaram o conjunto de migrations desde banco vazio. `ASAAS_API_KEY`,
+  `ASAAS_ACCOUNT_ID` e `DATAJUD_API_KEY` foram vazias durante os testes. Os quatro
+  contêineres desta validação foram conferidos ausentes após execução. Uma
+  tentativa anterior da suíte completa com `--compiler source` teve 53 testes
+  aprovados e erro de carregamento em `contact_admin_endpoint_test.dart`
+  (`Protocol()` não encontrado); o mesmo teste passou 2/2 com kernel, e a suíte
+  completa kernel passou. A falha é específica do modo source neste ambiente.
+- Formatação sem gravação, Dart 3.8.0 direto: cliente, 26 arquivos, exit 0;
+  arquivos Asaas de UI, 2 arquivos, exit 0; arquivos Asaas do servidor, 2
+  arquivos, exit 0. A primeira verificação completa do servidor encontrou 78
+  arquivos limpos; a verificação final encontrou 79 e reportou apenas
+  `lib/src/chat/chat_endpoint.dart` fora de Asaas (exit 1), sem editar código.
+  Flutter `lib test` verificou 46 e reportou apenas
+  `test/admin_cases_screen_test.dart` fora de Asaas (exit 1), sem edição pelo
+  formatador final. Cliente e Flutter: `dart analyze --fatal-infos .` passaram
+  sem issues.
+  Servidor: a primeira análise reportou 7 infos de chaves ausentes e 22 warnings
+  `UuidValue` experimental; blocos explícitos foram adicionados apenas aos sete
+  `if`s Asaas. A nova análise não reportou infos, mas ainda retorna exit 2 com
+  22 warnings experimentais de `UuidValue` (16 preexistentes e 6 em fixtures
+  Asaas). Não foram suprimidos warnings de API experimental.
+- Falha operacional desta sessão: foi executado por engano na raiz o comando
+  `C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe format --set-exit-if-changed .`
+  (Dart 3.13.3). Em 8,80 s, percorreu 1.183 arquivos, alterou 231 e terminou
+  exit 65 por snapshots de SDK 3.8 incompatíveis com o parser mais novo. Tocou
+  224 arquivos Dart ignorados em `/build` e 7 arquivos Dart fora de `/build`.
+  Nenhum documento Asaas, manifesto ou lockfile foi editado por esse comando.
+- Recuperação executada por `/root`: os três arquivos rastreados que estavam
+  limpos no baseline (`admin_cases_screen_test.dart`, `admin_users_screen_test.dart`
+  e `tools/testing/run_isolated_e2e.dart`) foram restaurados do `HEAD`; os hashes
+  Git normalizados conferem com os blobs `6fb16148749e5f6725cb100bbf3b42308fafa7c7`,
+  `d5f5c71bc2a387f5b64c36da53dec82077f8e4a8` e
+  `34ac3363f988afb37c335baeb55820e076905b43`. Ainda estão formatados dois
+  testes Asaas não rastreados (`admin_billing_screen_test.dart`,
+  `billing_installment_endpoint_test.dart`) e duas fontes auxiliares QA
+  (`packages/signcob_flutter/build/qa/review_auth_layout_test.dart`,
+  `review_auth_state_test.dart`). Não encontrei cópia byte a byte desses quatro
+  arquivos; não afirmo preservação exata nem alteração de comportamento. Os dois
+  testes Asaas passaram; os helpers QA não foram reexecutados e requerem revisão.
+- Recuperação exata de arquivos ignorados em `/build`: dos 224 arquivos Dart
+  tocados pelo formatador acidental, 96 fontes do SDK foram restauradas de
+  entradas correspondentes em `build/workflow-sdk-3.8.0/dart.zip` e tiveram
+  hashes conferidos; outros 109 snapshots foram restaurados a partir de cópias
+  que batiam com `build/asaas-preservacao-inicial.json`; mais 5 arquivos do
+  snapshot QA foram restaurados a partir da raiz com hashes conferidos pelo
+  `build/asaas-sandbox-qa-source-manifest-20261105.json`. Total restaurado:
+  210/224, com caminhos absolutos validados dentro de `build` e SHA-256 igual à
+  origem registrada. Permanecem 14 sem origem exata demonstrada: `admin_cases`
+  e `admin_users` em `asaas-base` e `asaas-candidato`; `test.dart` em
+  `asaas-etapa3-temp/dart_test.kernel.56087c80`; `admin_cases` em
+  `asaas-integracao`; `client.dart` e `billing_charge.dart` em
+  `asaas-sandbox-qa-20261105`; `client.dart` e `admin_cases` em
+  `baseline-workflows-legados`; `client.dart`, `admin_cases` e `admin_users`
+  em `revisao-browser-e2e`; e `client.dart` e `admin_cases` em
+  `revisao-workflows-legados`. Não restaurei esses 14 por suposição. Todos os
+  caminhos em `/build` seguem ignorados pelo Git; não declaro seu estado anterior
+  byte a byte preservado.
+- Arquivos funcionais Asaas ajustados nesta validação: blocos em sete `if`s em
+  `asaas_sandbox_provider.dart` e `billing_endpoint.dart` para remover infos do
+  analisador. Nenhuma migration/gerado foi editado manualmente. Nenhuma chamada
+  externa Asaas/DataJud, credencial, cobrança, webhook, worker, produção,
+  publicação, commit ou push foi usada.
+- Estado de validação: testes focados e suíte completa passaram em transporte
+  sintético; cliente/Flutter têm análise limpa; servidor ainda tem warnings
+  experimentais e não retorna exit 0 no analyzer local; as APIs, cobrança,
+  liquidação e combinação real de cartão permanecem `not_verified`. A revisão
+  independente deve conferir os dois ajustes Asaas e a ocorrência/recuperação
+  incompleta dos arquivos ignorados em `/build` antes do aceite final.
+
+### Comandos literais e evidências desta validação
+
+Os comandos Dart abaixo foram executados no diretório do pacote indicado. A
+tentativa comum de resolução e a suíte completa `source` estão registradas
+porque explicam os desvios; os aceites finais vieram do runner `kernel` padrão.
+
+Runtime e resolução:
+
+```powershell
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' --version
+cmd.exe /d /s /c '""C:\src\flutter\bin\dart.bat" --version"' # timeout 10 s
+cmd.exe /d /s /c '""C:\src\flutter\bin\flutter.bat" --version"' # timeout 10 s
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' 'C:\src\flutter\bin\cache\flutter_tools.snapshot' --version
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' test --reporter expanded --concurrency=1 test/unit/asaas_sandbox_provider_test.dart test/unit/asaas_customer_provider_test.dart
+& 'C:\Users\Administrador\projetos\signcob\build\workflow-sdk-3.8.0\dart-sdk\bin\dart.exe' --packages=.dart_tool/package_config.json 'C:\Users\Administrador\AppData\Local\Pub\Cache\hosted\pub.dev\test-1.29.0\bin\test.dart' --compiler source --reporter expanded --concurrency=1 test/unit/asaas_sandbox_provider_test.dart test/unit/asaas_customer_provider_test.dart
+& 'C:\Users\Administrador\projetos\signcob\build\workflow-sdk-3.8.0\dart-sdk\bin\dart.exe' pub get --offline
+```
+
+O primeiro `dart test` tentou pub.dev (socket error, exit 65, 24,52 s). `pub
+get --offline` terminou exit 69: `test` não foi encontrado pelo resolvedor
+offline. O runner `test-1.29.0` local evitou resolução; Dart 3.13.3 passou os
+unitários 8/8 (22,43 s, exit 0). Dart 3.8.0 nesse runner local falhou após
+28,58 s, exit 254, porque analyzer 10.0.1 declara linguagem 3.9.
+
+Setup e remoção do banco usados nas quatro execuções de integração. `$dbPass`
+era um GUID aleatório efêmero, não registrado; a chave Asaas ficou vazia:
+
+```powershell
+$container = 'signcob-server-kernel-' + [guid]::NewGuid().ToString('N')
+$dbPass = [guid]::NewGuid().ToString('N')
+docker run -d --pull never --name $container --tmpfs /var/lib/postgresql/data --label signcob.qa=server-kernel-asaas -p '127.0.0.1::5432' -e "POSTGRES_PASSWORD=$dbPass" -e POSTGRES_DB=signcob_test pgvector/pgvector:pg16
+$binding = docker port $container '5432/tcp'
+if ($binding -notmatch '^127\.0\.0\.1:(\d+)$') { throw 'port binding failed' }
+$env:SERVERPOD_DATABASE_HOST = '127.0.0.1'
+$env:SERVERPOD_DATABASE_PORT = $Matches[1]
+$env:SERVERPOD_DATABASE_NAME = 'signcob_test'
+$env:SERVERPOD_DATABASE_USER = 'postgres'
+$env:SERVERPOD_DATABASE_PASSWORD = $dbPass
+$env:ASAAS_ENV = 'sandbox'
+$env:ASAAS_API_KEY = ''
+$env:ASAAS_ACCOUNT_ID = ''
+$env:DATAJUD_API_KEY = ''
+docker exec $container pg_isready -h 127.0.0.1 -d signcob_test -U postgres
+```
+
+Cada banco foi removido em `finally` por `docker rm -f $container`; a consulta
+literal de remoção foi `docker rm -f $container`; a consulta final
+`docker ps -a --format '{{.Names}}'` confirmou zero contêineres com os prefixos
+desta rodada. As fixtures Serverpod criaram o schema e aplicaram as migrations
+no banco vazio.
+
+Testes e Flutter:
+
+```powershell
+# packages/signcob_server — 21/21 integração Asaas, source; 72,30 s, exit 0
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' --packages=.dart_tool/package_config.json 'C:\Users\Administrador\AppData\Local\Pub\Cache\hosted\pub.dev\test-1.29.0\bin\test.dart' --compiler source --reporter expanded --concurrency=1 test/integration/billing_customer_endpoint_test.dart test/integration/billing_endpoint_test.dart test/integration/billing_installment_endpoint_test.dart test/integration/billing_recurring_endpoint_test.dart
+
+# packages/signcob_server — suíte completa, source; 53 passaram e contact_admin falhou ao carregar; 224,02 s, exit 1
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' --packages=.dart_tool/package_config.json 'C:\Users\Administrador\AppData\Local\Pub\Cache\hosted\pub.dev\test-1.29.0\bin\test.dart' --compiler source --reporter expanded --concurrency=1
+
+# packages/signcob_server — contact_admin isolado, kernel; 2/2, 21,48 s, exit 0
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' --packages=.dart_tool/package_config.json 'C:\Users\Administrador\AppData\Local\Pub\Cache\hosted\pub.dev\test-1.29.0\bin\test.dart' --reporter expanded --concurrency=1 test/integration/contact_admin_endpoint_test.dart
+
+# packages/signcob_server — suíte completa, kernel; 56/56, 87,18 s, exit 0
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' --packages=.dart_tool/package_config.json 'C:\Users\Administrador\AppData\Local\Pub\Cache\hosted\pub.dev\test-1.29.0\bin\test.dart' --reporter expanded --concurrency=1
+
+# packages/signcob_flutter — 31/31, 23,69 s, exit 0
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' 'C:\src\flutter\bin\cache\flutter_tools.snapshot' test --no-pub test/admin_billing_screen_test.dart
+```
+
+Formatação e análise (todos sem gravação):
+
+```powershell
+# pacotes signcob_server e signcob_client, Dart 3.8.0 direto
+& 'C:\Users\Administrador\projetos\signcob\build\workflow-sdk-3.8.0\dart-sdk\bin\dart.exe' format --output=none --set-exit-if-changed .
+# Flutter, diretórios lib/test para excluir o snapshot auxiliar build/qa
+& 'C:\Users\Administrador\projetos\signcob\build\workflow-sdk-3.8.0\dart-sdk\bin\dart.exe' format --output=none --set-exit-if-changed lib test
+# apenas arquivos Asaas: servidor
+& 'C:\Users\Administrador\projetos\signcob\build\workflow-sdk-3.8.0\dart-sdk\bin\dart.exe' format --output=none --set-exit-if-changed lib/src/billing/asaas_sandbox_provider.dart lib/src/billing/billing_endpoint.dart
+# apenas arquivos Asaas: Flutter
+& 'C:\Users\Administrador\projetos\signcob\build\workflow-sdk-3.8.0\dart-sdk\bin\dart.exe' format --output=none --set-exit-if-changed lib/screens/admin_billing_screen.dart test/admin_billing_screen_test.dart
+# servidor, cliente e Flutter; Dart 3.13.3 direto, package configs existentes
+& 'C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe' analyze --fatal-infos .
+```
+
+Resultados: cliente format 26/0 e análise sem issues (exit 0); Flutter Asaas
+format 2/0 e análise sem issues (exit 0). Flutter `lib test` reportou o teste
+fora de escopo `admin_cases_screen_test.dart` (46 examinados, exit 1, 1,77 s).
+Servidor Asaas format 2/0 (exit 0, 0,82 s); pacote completo reportou somente
+`lib/src/chat/chat_endpoint.dart` fora de escopo (79 examinados, exit 1,
+1,87 s). Cliente format terminou exit 0 em 0,93 s; Flutter Asaas format em
+0,79 s. As análises terminaram: cliente exit 0 em 2,15 s, Flutter exit 0 em
+16,59 s, servidor exit 2 em 7,96 s, sem infos e com 22 warnings experimentais
+de `UuidValue`. Os três restores exatos em `/build` levaram 0,57 s (96 entradas
+SDK), 14,29 s (109 snapshots do manifest inicial) e 1,76 s (5 arquivos do
+manifest QA), todos com hashes pós-restauração conferidos. `git diff --check`
+dos documentos rastreados e código Asaas terminou exit 0; o contrato não
+rastreado foi verificado com `git diff --no-index --check -- NUL
+docs/development/asaas-sandbox-contratos.md` (exit 1 apenas pela presença do
+arquivo, sem aviso de whitespace). Não foram gravados logs de texto separados;
+as saídas foram da sessão e os resultados/tempos ficam registrados aqui.
+
+## Fechamento de preservação e qualidade Asaas — 07/11/2026
+
+- Autoria real: `agente57`; revisão independente: `Leibniz`, parecer
+  `changes_requested`. Nenhum commit ou push foi feito.
+- A enumeração concreta dos artefatos ignorados sem baseline byte a byte é de
+  **15**, corrigindo a contagem textual anterior de 14. Nenhum foi restaurado
+  por aproximação; todos permanecem intactos em `build/`. Os SHA-256 atuais
+  são: `asaas-base` e `asaas-candidato`, `admin_cases_screen_test.dart` =
+  `E2D8BB181A16250BB8A43BCCFF54354E43E7558FACD1E211F9C4F2B14968CDCE` e
+  `admin_users_screen_test.dart` =
+  `1937F3572BF06F420DA21AA1122198A588A30FA1E8EF01C1BD842D144462F354`;
+  `asaas-etapa3-temp/dart_test.kernel.56087c80/test.dart` =
+  `4B40A6F6C1B95BEE0228BF80458C10AE952252C9EE47765E7DD8DE463341C53C`;
+  `asaas-integracao/.../admin_cases_screen_test.dart` =
+  `4CE44CAD919B36445C61D982F7984D64C7367DA4AA87FAAD55F6EF0AF33A7CCE`;
+  `asaas-sandbox-qa-20261105/.../client.dart` =
+  `77DDAFCB406F0B72D4C3A25F59AC555C45F8DFEB642569D47723E9C30677B609` e
+  `.../packages/signcob_client/lib/src/protocol/billing/billing_charge.dart` =
+  `C1E23396746CFAC995E5D1902D2AC73FF6F387E14CBBE206E7185F3035CC9BFA`;
+  `baseline-workflows-legados` tem `client.dart` =
+  `39EE78521E1FDF081CBFADE83974128D83DD1CF6FB0B5AB2FC43D3F8B00341A5` e
+  `admin_cases_screen_test.dart` =
+  `4CE44CAD919B36445C61D982F7984D64C7367DA4AA87FAAD55F6EF0AF33A7CCE`;
+  `revisao-browser-e2e` tem `client.dart` =
+  `69629612775692BBCA2A8BDEC02FAD757E3251AB5A56C39035B7101734AD3EDA`,
+  `admin_cases_screen_test.dart` =
+  `E2D8BB181A16250BB8A43BCCFF54354E43E7558FACD1E211F9C4F2B14968CDCE` e
+  `admin_users_screen_test.dart` =
+  `1937F3572BF06F420DA21AA1122198A588A30FA1E8EF01C1BD842D144462F354`;
+  `revisao-workflows-legados` tem `client.dart` =
+  `39EE78521E1FDF081CBFADE83974128D83DD1CF6FB0B5AB2FC43D3F8B00341A5` e
+  `admin_cases_screen_test.dart` =
+  `A2DD024F2B3E34CC99B1D5AC8660159C64220911AF5BB83AF41E68C1B5ABF662`.
+  O registro anterior que citava `packages/signcob_server/.../billing_charge.dart`
+  estava incorreto; esse caminho não existe. A origem concreta é a fonte do
+  cliente indicada acima. Nenhum hash prova o baseline histórico original.
+- `agente57` não editou arquivos nesta rodada. Os dois arquivos Asaas ajustados
+  na validação anterior (`asaas_sandbox_provider.dart` e `billing_endpoint.dart`)
+  passaram formatação focalizada; não há baseline limpo para provar que os sete
+  blocos de análise são a única diferença. Isso permanece limitação documental.
+- Reexecuções: Flutter Asaas passou 31/31; análise cliente e Flutter sem issues;
+  formatação focalizada Asaas servidor/UI passou 2+2 arquivos sem alterações.
+  Unitários Asaas foram registrados pela revisão independente como 8/8 em
+  18,5 s, modo source. A integração 21/21, suíte Serverpod 56/56 e migrations
+  em banco descartável permanecem comprovadas pela execução anterior registrada
+  acima. A nova tentativa de integração/suíte não pôde iniciar banco: Docker/
+  PostgreSQL estavam inacessíveis, com conexão recusada em `localhost:9090`.
+  Não há contêiner QA remanescente.
+- A análise global reproduz 22 warnings experimentais `UuidValue` (16 fora do
+  Asaas e 6 em fixtures Asaas), sem supressão. Cliente e Flutter permanecem
+  limpos; a análise global do servidor não é `exit 0` por avisos experimentais
+  e há infos fora do Asaas no código de chat. Nenhuma correção fora do Asaas foi
+  feita.
+- Revisão independente `Leibniz`: `changes_requested`, com achados P1 sobre a
+  contagem 15 e o caminho de `billing_charge.dart`, corrigidos neste registro;
+  P2 sobre ausência de baseline limpo dos dois ajustes e infos fora do Asaas
+  permanecem como limitações. O critério de aceite 5 não está satisfeito como
+  `accepted` nesta rodada; o parecer e as limitações foram preservados antes
+  de qualquer nova correção.
+- Nenhuma chamada Asaas, credencial, produção, worker, webhook, publicação,
+  commit ou push foi usada. Alterações preexistentes, documentos, scripts e
+  artefatos ignorados foram preservados.
+
+## Retomada final do sandbox Asaas — 07/11/2026
+
+- Autoria solicitada ao agente `agente57`; ele leu os contratos/perfis, não
+  alterou arquivos nesta rodada e confirmou que não havia correção funcional
+  necessária. Revisão independente `Feynman` foi executada antes deste registro;
+  a primeira revisão retornou `changes_requested` por documentação desatualizada
+  e falta de evidência da recuperação do Docker. Esse parecer permanece
+  registrado; após esta atualização documental será solicitada nova revisão.
+- O Docker Desktop foi restaurado iniciando o serviço local `com.docker.service`
+  e o backend do Docker Desktop. `docker info` respondeu `29.2.1 Docker Desktop`;
+  comandos Docker desta rodada usaram apenas a permissão local necessária ao
+  engine. O Compose de desenvolvimento não foi usado nem alterado.
+- Variáveis usadas em cada execução: `ASAAS_ENV=sandbox`,
+  `ASAAS_API_KEY=''`, `ASAAS_ACCOUNT_ID=''` e `DATAJUD_API_KEY=''`. O servidor
+  usou somente transporte sintético nos testes; não houve chamada HTTP real ao
+  Asaas, credencial, produção, worker, webhook, publicação, commit ou push.
+- Resultados reproduzíveis, com `C:\src\flutter\bin\cache\dart-sdk\bin\dart.exe`
+  3.13.3, `test-1.29.0`, `--compiler source` e `--concurrency=1`: unitários
+  Asaas 8/8, exit 0, 49,64s; integração Asaas
+  `billing_customer_endpoint_test.dart`, `billing_endpoint_test.dart`,
+  `billing_installment_endpoint_test.dart` e `billing_recurring_endpoint_test.dart`
+  21/21, exit 0, 94s; Flutter focalizado
+  `test/admin_billing_screen_test.dart` 31/31, exit 0, 26,98s; suíte completa
+  do servidor 72/72, exit 0, 261s. A suíte completa inclui os módulos
+  preexistentes e não recebeu alterações nesta validação.
+- A integração usou o contêiner efêmero `signcob-asaas-qa-f64e6b5cfb8e467d989d96b848a6116d`
+  com `pgvector/pgvector:pg16`, banco vazio, tmpfs e porta local aleatória;
+  foi removido ao final. A aplicação explícita de migrations em banco vazio foi
+  feita no contêiner `signcob-asaas-migrate-c8711d389f1f4a949862e07999cbab27`
+  com `dart bin/main.dart --mode=test --apply-migrations`; após 35s, a consulta
+  `select count(*) from serverpod_migrations` retornou `4`. Esse contêiner também
+  foi removido. A verificação final por labels retornou zero contêineres QA Asaas;
+  um `signcob_server-postgres_test-1` preexistente permaneceu intocado.
+- Os 15 artefatos ignorados em `build/` não foram lidos para restauração nem
+  alterados nesta rodada; os hashes atuais registrados acima permanecem como
+  observação, não como prova de baseline byte a byte. Não se declara preservação
+  histórica byte a byte por ausência desse baseline.
+- Os warnings experimentais `UuidValue` permanecem sem supressão ou correção;
+  a análise global do servidor continua não sendo aceite como limpa por esses
+  warnings e por informações fora do Asaas. Nenhuma funcionalidade fora do
+  Asaas foi modificada nesta rodada.
+
+## Etapa 10 — provisionamento seguro de conversas e participantes — 07/11/2026
+
+- Autoria independente: `Beauvoir` (backend/contratos/testes) e `Huygens`
+  (Flutter/testes); revisão independente: `Dalton`. A integração final e as
+  correções desta sessão foram feitas pela sessão principal.
+- Backend acrescentou `createConversation`, `addParticipant`,
+  `removeParticipant`, `listCreationClients` e `listParticipants`, com
+  autorização atual no servidor, isolamento por cliente, remoção lógica,
+  idempotência por criador/chave, locks transacionais, limites explícitos e
+  timestamps UTC.
+- `serverpod generate` offline 3.2.3 regenerou servidor, cliente e
+  `serverpod_test_tools`; a migration anterior
+  `20261107133745758-chat-first-slice` foi preservada e
+  `20261107164547739-chat-provisioning` só adiciona as colunas/índice de
+  idempotência. Nenhuma migration Asaas foi alterada.
+- PostgreSQL de teste ativo em `localhost:9090` no contêiner
+  `signcob_server-postgres_test-1`; `pg_isready` confirmou accepting
+  connections. Testes focados do servidor: **16/16 passaram**.
+- Flutter integrou `ServerpodChatProvisioning` ao painel, com seleção filtrada,
+  criação idempotente, roster ativo, inclusão por UUID validado no servidor,
+  remoção lógica, retry, acesso negado, prevenção de repetição, troca de sessão
+  e layouts 390/1200 px ampliados. Análise focada limpa; Flutter: **20/20**;
+  suíte integrada final: **123 aprovados e 7 ignorados**.
+- A revisão inicial encontrou inclusão sem candidatos e documentação antiga.
+  Corrigido com entrada UUID manual controlada pelo adaptador real, atualização
+  de `chat.md`/estado e validação local de controles no título. Nova revisão
+  final do estado corrigido permanece recomendada.
+- Limitações: 22 avisos experimentais `UuidValue` preexistentes; suíte completa,
+  build web e teste visual no navegador não foram repetidos. Sem credenciais,
+  chamadas Asaas/DataJud, agenda, OAuth, anexos, workers, filas, webhooks,
+  publicação, commit ou push.
+
+## Aceite final da retomada Asaas — 07/11/2026
+
+- Segunda revisão independente, executada por `Ampere` após a correção dos
+  registros 56→72, retornou `accepted`. O primeiro parecer de `Feynman`
+  (`changes_requested`) permanece preservado como histórico e foi resolvido
+  pela evidência reproduzível e pela atualização dos dois documentos Asaas.
+- Critérios de aceite atendidos: Docker/PostgreSQL descartável iniciado e
+  removido; 8 unitários, 21 integração Asaas, 31 Flutter focalizados e 72
+  testes da suíte completa passaram; migrations aplicadas desde banco vazio;
+  variáveis sandbox sem chave/account; nenhum acesso externo Asaas, credencial,
+  produção, worker ou webhook; 15 artefatos `build/` preservados sem alegação
+  indevida de baseline byte a byte; warnings `UuidValue` não suprimidos nem
+  corrigidos. Nenhum commit ou push foi feito.
+
+## Validação final da Etapa 10 — chat — 07/11/2026
+
+- Estado preexistente registrado antes da execução: worktree já continha as
+  alterações das etapas anteriores, incluindo Asaas, documentos, artefatos
+  ignorados e os arquivos do chat já implementados; nada fora do escopo do chat
+  foi editado. Nenhum commit ou push foi feito.
+- Ambiente: banco vazio temporário `signcob_chat_20261107`, criado no contêiner
+  preexistente `signcob_server-postgres_test-1` sem pará-lo; `pg_isready`
+  confirmou accepting connections. O contêiner próprio inicialmente criado em
+  porta isolada não foi usado pelo Dart por restrição de socket local e foi
+  removido; o banco temporário e suas conexões também foram removidos. O
+  contêiner preexistente e o banco `signcob_test` foram preservados.
+- Migrations Serverpod aplicadas desde o banco vazio com Serverpod 3.2.3:
+  `20261107133745758-chat-first-slice` e
+  `20261107164547739-chat-provisioning`; o schema final confirmou
+  `chat_conversation`, `chat_message`, `chat_participant` e o índice único de
+  criador/requestId. A tabela Serverpod registra a versão final da cadeia por
+  módulo, como esperado pelo mecanismo de atualização.
+- Comandos reproduzidos: `dart test test/integration/chat_endpoint_test.dart
+  test/integration/chat_provisioning_test.dart` (**16/16**); `flutter test
+  test/admin_chat_screen_test.dart test/chat_provisioning_test.dart`
+  (**20/20**); `dart test` completo do servidor (**70 passaram, 2 falharam** em
+  `legal_client_endpoint_test.dart` e `local_journeys_test.dart`, ambos fora
+  do chat e reproduzidos na suíte ampla); `flutter test` completo (**123
+  passaram, 7 ignorados**).
+- Análise focalizada backend e Flutter: sem problemas. Formatação focalizada
+  executada nos arquivos do chat. A verificação de autorização cobriu sócio,
+  advogado, atendimento, cliente, financeiro, anônimo, conta bloqueada,
+  revogação, reatribuição, participante removido e repetição concorrente do
+  `requestId`; os cenários relevantes passaram nos testes focados.
+- Hashes SHA-256 relevantes: `chat_endpoint.dart`
+  `C917CECC1384B6DA9B8D0A22D6D113D6CAF1878A15F77C64DFAA0DB58B95E4EB`;
+  `chat_endpoint_test.dart`
+  `75359538342E9DA97A60CED6B4FBC4B4A878723CF0AAF709D9A5D64B6D65FD43`;
+  `chat_provisioning_test.dart`
+  `4D81FDAB0B20227217029980DBFF3DAF02EAF0AE5F53ADED4AC2AB67369A4617`;
+  `admin_chat_screen.dart`
+  `4903F28EBFB2BD3470A1977890C92A8597981F40D73884A204CCF5A82F56E0B7`;
+  `chat_provisioning_panel.dart`
+  `D6547EEB4F0E68611F23C69439969E42E6491415D64B94E16E8590AE2C0A6499`.
+- Limitações registradas: as duas falhas da suíte completa são de módulos
+  anteriores e não foram alteradas; build web, navegador e visual não foram
+  repetidos nesta retomada. Não foram usadas credenciais reais, produção,
+  Google OAuth, agenda, Asaas, DataJud, workers, filas ou webhooks.
+- Revisão independente final por `Parfit`: **accepted**. O parecer confirmou
+  migrations desde banco vazio, focused backend 16/16, Flutter 20/20, suíte
+  Flutter 123/7, falhas amplas fora do chat, análise/formatação focalizadas,
+  limpeza do ambiente e cobertura de autorização, isolamento, idempotência,
+  remoção lógica, locks, paginação e timestamps.
